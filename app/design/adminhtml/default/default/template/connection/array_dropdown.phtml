@@ -117,7 +117,7 @@ var arrayRow<?php echo $_htmlId ?> = {
         // generate default template data
         if ('' == templateData) {
             var d = new Date();
-            var templateData = {
+            templateData = {
 <?php foreach ($this->_columns as $columnName => $column):?>
                 <?php echo $columnName ?> : '',
 <?php endforeach;?>

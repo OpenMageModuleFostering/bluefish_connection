@@ -15,7 +15,12 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			$success = "";
 			$errorupdate = "";
 			#### Add Condition
-			if($_GET["hdnCmd"] == "Add")
+			
+			$hdnCmd = (!isset($_GET["hdnCmd"]))?"":$_GET["hdnCmd"];
+			$Action = (!isset($_GET["Action"]))?"":$_GET["Action"];
+			$ConnectionID = (!isset($_GET["ConnectionID"]))?"":$_GET["ConnectionID"];
+			
+			if($hdnCmd == "Add")
 			{
 				if(trim($txtAddCode) == "")
 					$error .= "Please enter Bluestore Code.<br>";
@@ -41,7 +46,7 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			}
 
 			##### Update Condition
-			if(isset($_GET["hdnCmd"]) && ($_GET["hdnCmd"] == "Update"))
+			if($hdnCmd == "Update")
 			{
 				if(trim($txtEditCode) == "")
 					$errorupdate .= "Please enter Bluestore Code.<br>";
@@ -64,9 +69,9 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			}
 
 			##### Delete Condition
-			if($_GET["Action"] == "Del")
+			if($Action == "Del")
 			{
-				$connection->query("DELETE FROM ".$prefix."bluefish_category where connection_id = '".$_GET[ConnectionID]."'");
+				$connection->query("DELETE FROM ".$prefix."bluefish_category where connection_id = '".$ConnectionID."'");
 			}
 		
 		$result = $connection->query("select * from ".$prefix."bluefish_category");
@@ -96,7 +101,7 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			}
 			function editButton(id)
 			{	
-				window.location = "<?=$_SERVER["PHP_SELF"];?>?Action=Edit&ConnectionID="+id;
+				window.location = "<?=$_SERVER['PHP_SELF'];?>?Action=Edit&ConnectionID="+id;
 			}
 			function deleteButton(id)
 			{	
@@ -134,17 +139,17 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 				$trcolor = "#DDFFDD";
 			else
 				$trcolor = "#EEFFEE";		
-				
-			if($resultSet[$i][connection_id] == $_GET["ConnectionID"] and ($_GET["Action"] == "Edit" || $errorupdate == ""))
+			
+			if($resultSet[$i]['connection_id'] ==  $ConnectionID and ($Action == "Edit" || $errorupdate == ""))
 			{
 			
 		  ?>
 			  <tr style="font-family: arial;font-size: 13px;background-color:<?php echo $trcolor;?>">
 				<td align="center">
-				<input type="hidden" name="hdnEditCustomerID" size="5" value="<?=$resultSet[$i][connection_id];?>">
-				<input type="text" name="txtEditCode" size="5" value="<?=$resultSet[$i][code];?>"></td>
-				<td align="center"><input type="text" name="txtEditCategoryID" size="5" value="<?=$resultSet[$i][category_id];?>"></td>
-				 <td align="center"><?=$resultSet[$i][created_time];?></td>
+				<input type="hidden" name="hdnEditCustomerID" size="5" value="<?=$resultSet[$i]['connection_id'];?>">
+				<input type="text" name="txtEditCode" size="5" value="<?=$resultSet[$i]['code'];?>"></td>
+				<td align="center"><input type="text" name="txtEditCategoryID" size="5" value="<?=$resultSet[$i]['category_id'];?>"></td>
+				 <td align="center"><?=$resultSet[$i]['created_time'];?></td>
 				<td align="right"><div align="center">
 				  <input name="btnAdd" type="button" id="btnUpdate" value="Update" OnClick="updateCategory('Update');">
 				  <input name="btnAdd" type="button" id="btnCancel" value="Cancel" OnClick="window.location='<?=$_SERVER["PHP_SELF"];?>';">
@@ -156,18 +161,18 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			{
 		  ?>
 			  <tr style="font-family: arial;font-size: 13px;background-color:<?php echo $trcolor;?>">
-				<td><div align="center"><?=$resultSet[$i][code];?></div></td>
-				<td align="center"><?=$resultSet[$i][category_id];?></td>
-				<td align="center"><?=$resultSet[$i][created_time];?></td>
-				<td align="center"><input name="btnEdit" type="button" id="btnEdit" value="Edit" OnClick="editButton('<?=$resultSet[$i][connection_id];?>');"> &nbsp;&nbsp;&nbsp; <input name="btnDelete" type="button" id="btnDelete" value="Delete" OnClick="deleteButton('<?=$resultSet[$i][connection_id];?>')"></a></td>
+				<td><div align="center"><?=$resultSet[$i]['code'];?></div></td>
+				<td align="center"><?=$resultSet[$i]['category_id'];?></td>
+				<td align="center"><?=$resultSet[$i]['created_time'];?></td>
+				<td align="center"><input name="btnEdit" type="button" id="btnEdit" value="Edit" OnClick='editButton("<?=$resultSet[$i]['connection_id'];?>");'> &nbsp;&nbsp;&nbsp; <input name="btnDelete" type="button" id="btnDelete" value="Delete" OnClick='deleteButton("<?=$resultSet[$i]['connection_id'];?>")'></a></td>
 			  </tr>
 		  <?php
 			}
 		}
 		?>
 		  <tr style="font-family: arial;font-size: 13px;background-color:6F8992;">
-			<td><div align="center"><input type="text" name="txtAddCode" value="<?=$txtAddCode?>" size="5"></div></td>
-			<td align="center"><input type="text" name="txtAddCategoryID" size="5" value="<?=$txtAddCategoryID?>"></td>
+			<td><div align="center"><input type="text" name="txtAddCode" value="<?=isset($txtAddCode)?$txtAddCode:'';?>" size="5"></div></td>
+			<td align="center"><input type="text" name="txtAddCategoryID" size="5" value="<?=isset($txtAddCategoryID)?$txtAddCategoryID:'';?>"></td>
 			<td align="center"><input type="text" value="<?=date("Y-m-d H:i:s")?>" readonly="readonly" name="txtAddCreatedTime" size="20"></td>
 			<td align="right"><div align="center">
 			  <input name="btnAdd" type="button" id="btnAdd" value="Add" OnClick="frmMain.hdnCmd.value='Add';frmMain.submit();">

@@ -41,11 +41,11 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
 		if (is_array($value)) {
-            unset($value['__empty']);
-        }
+			unset($value['__empty']);
+		}
 		
-		$cronPath 		= $this->getPath();
-		$loopCounter    = count($value);
+		$cronPath 	 = $this->getPath();
+		$loopCounter     = count($value);
 		
 		$resultPath      = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = '".$cronPath."'");
 		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
@@ -73,9 +73,13 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 				 break;
 			case "mycustom_section/mycustom_sales_group/mycustom_sales_commonschedule":
 				 $markers = $doc->getElementsByTagName('bluefish_connection_orderexport');
+				 $markersSales = $doc->getElementsByTagName('bluefish_connection_orderimport');
 				 break;
 		}
 		$countNum = 0;
+		$Minutecronconfig = "";
+		$Hourcronconfig   = "";
+		
 		foreach($value as $key => $valueconfig)
 		{
 			if($countNum == 0)
@@ -95,11 +99,21 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 		}
 			
 		
-		if(count($resultCronPath) == 0 || $resultCronPath[0][loopCounter] == '0')
+		if(count($resultCronPath) == 0 || $resultCronPath[0]['loopCounter'] == '0')
 		{
-			foreach($markersCustomer as $marker)
+			if(isset($markersCustomer))
 			{
-				$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+				foreach($markersCustomer as $marker)
+				{
+					$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+				}
+			}
+			if(isset($markersSales))
+			{
+				foreach($markersSales as $marker)
+				{
+					$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+				}
 			}
 			foreach($markers as $marker)
 			{
@@ -109,14 +123,14 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 			$doc->save($xmlFile);	
 			$loopIteration = '1';
 			
-			if($resultCronPath[0][loopCounter] != '0')
+			if($resultCronPath[0]['loopCounter'] != 0)
 			{
 				$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule(id,cronPath,loopCounter,loopIteration)
 							VALUES('','".$cronPath."','".$loopCounter."','".$loopIteration."')");	
 			}
 			else
 			{
-				if(($loopCounter == '0') || ($resultCronPath[0][loopIteration] > $loopCounter ))
+				if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
 				{
 					$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$loopIteration."' where cronPath = '".$cronPath."'");					
 				}
@@ -125,15 +139,25 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 		}
 		else
 		{
-			if(($loopCounter == '0') || ($resultCronPath[0][loopIteration] > $loopCounter ))
+			if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
 			{
 				$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '0' where cronPath = '".$cronPath."'");					
 			}
 			else if($loopCounter == '1')
 			{
-				foreach($markersCustomer as $marker)
+				if(isset($markersCustomer))
 				{
-					$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+					foreach($markersCustomer as $marker)
+					{
+						$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+					}
+				}
+				if(isset($markersSales))
+				{
+					foreach($markersSales as $marker)
+					{
+						$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+					}
 				}
 				foreach($markers as $marker)
 				{
@@ -146,7 +170,7 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 			$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopCounter= '".$loopCounter."' where cronPath = '".$cronPath."'");	
 		}
 
-		$this->setValue($value);
-        parent::_beforeSave();
+	$this->setValue($value);
+	parent::_beforeSave();
     }
 }

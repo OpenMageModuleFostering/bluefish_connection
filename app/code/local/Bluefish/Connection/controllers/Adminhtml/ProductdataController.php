@@ -102,7 +102,7 @@ class Bluefish_Connection_Adminhtml_ProductdataController extends Mage_Adminhtml
 			}
 			function editButton(id)
 			{	
-				window.location = "<?=$_SERVER["PHP_SELF"];?>?Action=Edit&ConnectionID="+id;
+				window.location = "<?=$_SERVER['PHP_SELF'];?>?Action=Edit&ConnectionID="+id;
 			}
 			function deleteButton(id)
 			{	

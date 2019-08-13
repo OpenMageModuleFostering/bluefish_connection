@@ -143,17 +143,17 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-						<mycustom_sales_commonschedule translate="label">
+			<mycustom_sales_commonschedule translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
-							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+			    <backend_model>bluefish_connection_model_validationcrontime</backend_model>
                             <sort_order>2</sort_order>
-							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when sales will be sent to bluestore.]]></comment>
+			    <comment><![CDATA[Add one or more schedule lines to indicate times during the day when sales will be sent to bluestore.]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_sales_commonschedule>
-						<mycustom_saledefaultcategory translate="label">
+			<mycustom_saledefaultcategory translate="label">
                             <label>Default Category for Sales Posting</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
@@ -161,7 +161,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_saledefaultcategory>	
-						<mycustom_customer_number translate="label">
+			<mycustom_customer_number translate="label">
                             <label>Bluestore Customer Code for Guest Checkout</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
@@ -169,15 +169,31 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_customer_number>	
-						<mycustom_sale_chargescode translate="label">
+			<mycustom_sale_chargescode translate="label">
                             <label>Bluestore Charge Code for Delivery Charges</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </mycustom_sale_chargescode>							
-					</fields>
+                        </mycustom_sale_chargescode>
+			<mycustom_customer_idimport translate="label">
+                            <label>Magento Customer Id for Sales Import</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_customer_idimport>			
+			<mycustom_bluestore_enddatetime translate="label">
+                            <label>Bluestore Last Sale End DateTime</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_bluestore_enddatetime>			
+		    </fields>
                 </mycustom_sales_group>					
 				
 
@@ -263,14 +279,32 @@
                        	<mycustom_payment_checkmethod translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_paymentmethodcode</frontend_model>
-							<backend_model>bluefish_connection_model_validationpaymentmap</backend_model>
+			    <backend_model>bluefish_connection_model_validationpaymentmap</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_payment_checkmethod>
-					</fields>
-                </mycustom_payment_group>	
+		    </fields>
+                </mycustom_payment_group>
+                <mycustom_taxclass_group translate="label">
+                    <label>Bluestore Product Tax Class</label>
+                    <sort_order>90</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                       	<mycustom_taxclass_magento translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_bluestoretaxclass</frontend_model>
+			    <backend_model>bluefish_connection_model_validationtaxclass</backend_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_taxclass_magento>
+		    </fields>
+                </mycustom_taxclass_group>		
 
             </groups>
         </mycustom_section>
@@ -292,6 +326,124 @@
 				</cron>
 			</groups>
 		</system>
-		
+
+        <carriers>
+            <groups>
+                <bluefish_connection>
+                    <label>Bluestore Sale Shipping Module</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>99</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <name translate="label">
+                            <label>Method Name</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </name>
+                        <price translate="label">
+                            <label>Price</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </price>
+                        <specificerrmsg translate="label">
+                            <label>Displayed Error Message</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificerrmsg>
+                        <sallowspecific translate="label">
+                            <label>Ship to Applicable Countries</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>90</sort_order>
+                            <frontend_class>shipping-applicable-country</frontend_class>
+                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sallowspecific>
+                        <specificcountry translate="label">
+                            <label>Ship to Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>91</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </specificcountry>
+                    </fields>
+                </bluefish_connection>
+            </groups>
+        </carriers>
+
+
+
+        <payment>
+            <groups>
+                <bluefish_connection>
+                    <label>Bluestore Paid</label>
+                    <sort_order>1000</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </active>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status_processing</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </order_status>
+                        <title translate="label">
+                            <label>Payment Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </title>
+                    </fields>
+                </bluefish_connection>
+            </groups>
+        </payment>
+
     </sections>
 </config>

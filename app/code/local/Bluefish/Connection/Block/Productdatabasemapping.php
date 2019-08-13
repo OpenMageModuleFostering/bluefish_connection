@@ -57,7 +57,7 @@ class Bluefish_Connection_Block_Productdatabasemapping extends Mage_Adminhtml_Bl
 		
 		if($numberRows > 0)
 		{
-			$unserielVal = unserialize($resultCronPath[0][value]);
+			$unserielVal = unserialize($resultCronPath[0]['value']);
 			
 			$checkbox_Direct  = ($unserielVal['#{_id}']['Dbproductmapping'] == 'DirectProduct')?'checked':'unchecked';
 			$checkbox_Mapping = ($unserielVal['#{_id}']['Dbproductmapping'] == 'MappingProduct')?'checked':'unchecked';

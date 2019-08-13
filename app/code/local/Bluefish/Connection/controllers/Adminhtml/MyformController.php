@@ -18,6 +18,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 	const CUSTOMER        = 'https://bluestorelive.com:9001/rest/customer/';
 	const ORDERPOST    	  = 'https://bluestorelive.com:9001/rest/inbound/';
 	const CUSTOMERPOST    = 'https://bluestorelive.com:9001/rest/inbound/';
+	const SALEIMPORT    = 'https://bluestorelive.com:9001/rest/sale/';
 	
     public function indexAction()
     {
@@ -171,7 +172,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 		$fh = fopen($xmlFiles, 'w+');
 		fwrite($fh, $response);
 		fclose($fh);
-		$xmlFiles = "./customers_bluefish.xml";
+
 		if(!file_exists($xmlFiles))
 		{
 			$this->flag=3;
@@ -221,6 +222,56 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			} 
 		}
 	}
+	
+	### Function For Write Bluestore Sale Data into sales_bluestore.xml File
+	public function xmlActionSale($response)
+	{
+		$appBaseDir = Mage::getBaseDir();
+		$xmlFiles = $appBaseDir."/sales_bluestore_import.xml";
+
+		$fh = fopen($xmlFiles, 'w+');
+		fwrite($fh, $response);
+		fclose($fh);
+
+		if(!file_exists($xmlFiles))
+		{
+			$this->flag=3;
+			return ;
+		}
+		else if(!filesize($xmlFiles) > 0)
+		{
+			$this->flag=4;
+			return;
+		}
+		else
+		{
+			$result_config=cron_insert_saleimport();
+
+			if($result_config != "success")
+			{
+				$this->flag=5;
+				return $result_config;
+			}
+			else
+			{
+				$result_database = importBluestoreSales();
+				if($result_database == "fail")
+				{
+					$this->flag=6;
+					return $result_database;
+				}elseif($result_database == "blankdata")
+				{
+					$this->flag=7;
+					return $result_database;
+				}
+				else
+				{
+					$this->flag = 8;
+					return;
+				}
+			} 
+		}
+	}	
 	
 	### Function For Parsing XML data For Customer and Sales 
 	public function parseXMLForPost($val,$xml)
@@ -731,14 +782,92 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				}
 			}
 		}
+		else if($val == 'saleimport')   ### Condition for Bluestore Customer Data
+		{
+			$baseurl = Bluefish_Connection_Adminhtml_MyformController::SALEIMPORT;
+			$appBaseDir = Mage::getBaseDir();
+			$permFile = $appBaseDir."/bluefish_privatekey.PEM";
+			$fh = fopen($permFile, 'w');
+			fwrite($fh, $credentials['mycustom_certificate']);
+			fclose($fh);
+			if(!file_exists($permFile))
+			{
+				$this->flag=1;
+				return;
+			}
+			else if(!filesize($permFile) > 0) //change == to >
+			{
+				$this->flag=2;
+				return;
+			}
+			else
+			{
+				$extra = $extraCode;
+				$stock_credentials = Mage::getStoreConfig('mycustom_section/mycustom_stock_group');
+				$sale_credentials  = Mage::getStoreConfig('mycustom_section/mycustom_sales_group');
+
+				$extraStoreCode    = $stock_credentials['mycustom_bluestorecode'];
+				$endDateTimeSpace  = explode(" ",$sale_credentials['mycustom_bluestore_enddatetime']);
+				$colonDateVal      = explode(":",$endDateTimeSpace[1]);
+				$secDate = $colonDateVal[2]+1;
+				$secReal = (strlen($secDate) == 1)?'0'.$secDate:$secDate;
+				
+				$endDateTime       = $endDateTimeSpace[0]. " ".$colonDateVal[0].":".$colonDateVal[1].":".$secReal." ".$endDateTimeSpace[2];
+
+				if(isset($extra) && !empty($extra))
+				{
+					$array=array();
+					$array=array('where'=>rawurlencode('storeCode <> '.$extraStoreCode.' and transactionCode = '.$extra.''));
+					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
+					
+					$auth_query = _build_http_query($auth);
+					$auth_query = $baseurl."?".$auth_query;
+					$tuCurl = curl_init();
+					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
+					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
+					$response = curl_exec($tuCurl);
+					$response1 = curl_getinfo( $tuCurl );
+					return $response;
+				}
+				else
+				{
+					$array=array();
+					$array=array('where'=>rawurlencode('storeCode <> '.$extraStoreCode.' and endDateTime >= '.'"'.$endDateTime.'"'.''));			
+					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
+					$auth_query = _build_http_query($auth);
+					$auth_query = $baseurl."?".$auth_query;
+					$tuCurl = curl_init();
+					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
+					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
+					$response = curl_exec($tuCurl);
+					$response1 = curl_getinfo( $tuCurl );
+					return $response;			
+				}
+			}
+		}		
 	}
 	
 	##### Function handles all the GET and POST data request
-    public function postAction($cron_value)
+    public function postAction($cron_value = "")
     {
 		$categorycode = $_REQUEST['categorycode'];
 		$productcode  = $_REQUEST['productcode'];
 		$customercode = $_REQUEST['customercode'];
+		$transactioncode = $_REQUEST['transactioncode'];
 		
 		$value_cron = $cron_value;
 		if(!$value_cron)
@@ -1593,6 +1722,165 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
 					}
 					break;
+				case 8:	#### This case handles the customer data
+					try
+					{
+							$response = $this->parseAction('saleimport',$transactioncode);
+							if($this->flag == 1)
+							{
+								$this->flag = 0;
+								$message = $this->__('There is a problem with the API authentication, the private key file could not be found. Please contact the site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate cannot be created.', null, './Bluestore_sales_import.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($this->flag == 2)
+							{
+								$this->flag = 0;
+								$message = $this->__('There is a problem with the API authentication, the private key file does not contain a valid certificate. Please contact the site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate is created.', null, './Bluestore_sales_import.log.text');
+								Mage::log('The Private Certificate cannnot be populated.', null, './Bluestore_sales_import.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($response == '')
+							{
+								$message = $this->__('There was no response from Bluestore. Please check the authentication settings and if the problem persists, contact your site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+								Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+								Mage::log('Sale Import Failed,No Sale Imported', null, './Bluestore_sales_import.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else
+							{
+								
+								$toXml1 = $this->xmlActionSale($response);
+
+								switch($this->flag)
+								{
+									case 3:
+									$this->flag = 0;
+										$message = $this->__('The incoming sale file could not be created. It is possible the server security settings are blocking creation of the file. Please contact your site administrator.');
+										Mage::getSingleton('adminhtml/session')->addError($message);
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file cannot be created.', null, './Bluestore_sales_import.log.text');
+										if(!$value_cron)
+										{
+											$this->_redirect('*/*');
+											break;
+										}
+									break;
+									
+									case 4:
+										$this->flag = 0;
+										$message = $this->__('The incoming sale file could not be created. It is possible the server security settings are blocking creation of the file. Please contact your site administrator.');
+										Mage::getSingleton('adminhtml/session')->addError($message);
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file is created.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml cannot be populated.', null, './Bluestore_sales_import.log.text');
+										if(!$value_cron)
+										{
+											$this->_redirect('*/*');
+											break;
+										}
+									break;
+									
+									case 5:
+										$this->flag = 0;
+										$message = $this->__('There was a problem with the data import. The configuration file could not be  populated. Please contact your site administrator.');
+										Mage::getSingleton('adminhtml/session')->addError($message);
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file is created.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Config file cannot not populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log("Error:$toXml1", null, './Bluestore_sales_import.log.text');
+										if(!$value_cron)
+										{
+											$this->_redirect('*/*');
+											break;
+										}
+									break;
+
+									case 6:
+										$this->flag = 0;
+										$message = $this->__('All of their records have not imported correctly. Please check all the sales record.');
+										Mage::getSingleton('adminhtml/session')->addError($message);
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file is created.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Config file is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log("Error:$toXml1", null, './Bluestore_sales_import.log.text');
+										Mage::log($toXml, null, './Bluestore_sales_import.log.text');
+										if(!$value_cron)
+										{
+											$this->_redirect('*/*');
+											break;
+										}
+									break;
+
+									case 7:
+										$this->flag = 0;
+										$message = $this->__('There is no more sales record on Bluestore according to condition.');
+										Mage::getSingleton('adminhtml/session')->addError($message);
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file is created.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Config file is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log("Error:$toXml1", null, './Bluestore_sales_import.log.text');
+										Mage::log($toXml, null, './Bluestore_sales_import.log.text');
+										if(!$value_cron)
+										{
+											$this->_redirect('*/*');
+											break;
+										}
+									break;
+								
+									case 8:
+										$this->flag = 0;
+										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml file is created.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Sale xml is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log('The Config file is populated.', null, './Bluestore_sales_import.log.text');
+										Mage::log('Sale Import Finished Successfully.', null, './Bluestore_sales_import.log.text');
+
+										if(!$value_cron)
+										{
+											$message = $this->__('Sale have been successfully imported.');
+											Mage::getSingleton('adminhtml/session')->addSuccess($message);
+											$this->_redirect('*/*');
+											break;
+										}
+										break;
+								}
+							}
+					}
+					catch (Exception $e)
+					{
+						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+					}
+					break;				
 
 		}
 		

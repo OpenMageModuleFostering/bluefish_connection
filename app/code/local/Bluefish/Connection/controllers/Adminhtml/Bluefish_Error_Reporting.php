@@ -8,7 +8,8 @@ ini_set('error_log','./var/log/Bluefish_error.log.text');
 ini_set('display_errors',FALSE);
 */
 //Error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', true);
+#error_reporting(E_ALL);
+#ini_set('display_errors', true);
+error_reporting(E_ALL ^ E_NOTICE);
 set_time_limit(0);
 ?>

@@ -31,47 +31,55 @@
  * @package    Mage_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Bluefish_Connection_Block_Databasemapping extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
+class Bluefish_Connection_Block_Bluestoretaxclass extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
 {
     protected $magentoAttributes;
  
     public function __construct()
     {
-        $this->addColumn('Dbmapping', array(
-            'label' => Mage::helper('adminhtml')->__('Choose One Option'),
+        $this->addColumn('magentotaxclass', array(
+            'label' => Mage::helper('adminhtml')->__('Magento Product Tax Class'),
             'size'  => 28,
         ));
+        $this->addColumn('bluestoretaxclass', array(
+            'label' => Mage::helper('adminhtml')->__('Bluestore Product Tax Class code'),
+            'size'  => 28
+        ));
+        $this->_addAfter = false;
+        $this->_addButtonLabel = Mage::helper('adminhtml')->__('Add New Tax Class');
  
         parent::__construct();
-        $this->setTemplate('connection/custom_radioinput.phtml');
+        $this->setTemplate('connection/array_dropdown.phtml');
     }
  
     protected function _renderCellTemplate($columnName)
     {
-		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
-		$prefix 	= Mage::getConfig()->getTablePrefix();
-		$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
-		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
-		$numberRows 	 = count($resultCronPath);
-		
-		if($numberRows > 0)
-		{
-			$unserielVal = unserialize($resultCronPath[0]['value']);
-			
-			$checkbox_Direct  = ($unserielVal['#{_id}']['Dbmapping'] == 'Direct')?'checked':'unchecked';
-			$checkbox_Mapping = ($unserielVal['#{_id}']['Dbmapping'] == 'Mapping')?'checked':'unchecked';
-		}
-		else
-			$checkbox_Direct = 'checked';
-
-		
         if (empty($this->_columns[$columnName])) {
             throw new Exception('Wrong column name specified.');
         }
         $column     = $this->_columns[$columnName];
         $inputName  = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
  
-         $rendered = 'Direct Mapping <input type="radio" name="'.$inputName.'" value="Direct" onclick="getdetails_related(\'Direct\')" '.$checkbox_Direct.' id="Direct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mapping Table <input type="radio" name="'.$inputName.'" value="Mapping" onclick="getdetails_related(\'Mapping\')" '.$checkbox_Mapping.' id="Mapping" >';
+        if($columnName == 'magentotaxclass')
+        {
+	    $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+	    $prefix 	= Mage::getConfig()->getTablePrefix();					
+	    $resulttaxClass = $connection->query("SELECT * FROM ".$prefix."tax_class WHERE class_type = 'PRODUCT'");
+	    $resultTax = $resulttaxClass->fetchAll(PDO::FETCH_OBJ);
+	    
+	    $rendered = '<select name="'.$inputName.'">';
+	    
+	    foreach($resultTax as $value)
+	    {
+		    $rendered .= '<option value="'.$value->class_id.'">'.$value->class_name.'</option>';
+	    }
+	    
+	    $rendered .= '</select>';
+        }
+        else
+        {
+            $rendered = '<input type="text" name="'.$inputName.'" value="">';
+        }
          return $rendered;
     }
 }

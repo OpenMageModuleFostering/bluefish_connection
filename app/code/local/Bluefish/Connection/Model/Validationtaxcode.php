@@ -36,55 +36,53 @@ class Bluefish_Connection_Model_Validationtaxcode extends Mage_Adminhtml_Model_S
      */
     protected function _beforeSave()
     {
-		$oldvalue = $this->getOldValue();
-		$unserielVal = unserialize($oldvalue);
-		foreach($unserielVal as $oldrate => $oldtaxcode)
-		{	
-			$rateArr[]    = $oldtaxcode['rate'];
-			$taxcodeArr[] = $oldtaxcode['taxcode'];					
-		}	
+	    $oldvalue = $this->getOldValue();
+	    $unserielVal = unserialize($oldvalue);
+	    foreach($unserielVal as $oldrate => $oldtaxcode)
+	    {	
+		    $rateArr[]    = $oldtaxcode['rate'];
+		    $taxcodeArr[] = $oldtaxcode['taxcode'];					
+	    }	
       
 	   $value = $this->getValue();
        
-		if (is_array($value)) {
-            unset($value['__empty']);
-        }
-		
+	    if (is_array($value)) {
+	          unset($value['__empty']);
+	    }
 	
-		foreach($value as $rate => $taxcode)
-		{
-			$rateNewArr[]      = $taxcode['rate'];
-			#$taxcodeNewArr[]   = $taxcode['taxcode'];	
-			
-			if(($taxcode['rate'] == "") && ($taxcode['taxcode'] == ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Tax rate and Bluestore tax code are required.');
-			}
-			if(($taxcode['rate'] == "") && ($taxcode['taxcode'] != ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Tax rate is required.');
-			}	
-			if(($taxcode['rate'] != "") && ($taxcode['taxcode'] == ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Bluestore tax code is required.');
-			}
-		
-		}
+	    foreach($value as $rate => $taxcode)
+	    {
+		    $rateNewArr[]      = $taxcode['rate'];
+		    
+		    if(($taxcode['rate'] == "") && ($taxcode['taxcode'] == ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Tax rate and Bluestore tax code are required.');
+		    }
+		    if(($taxcode['rate'] == "") && ($taxcode['taxcode'] != ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Tax rate is required.');
+		    }	
+		    if(($taxcode['rate'] != "") && ($taxcode['taxcode'] == ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Bluestore tax code is required.');
+		    }
+	    
+	    }
 
-		function get_duplicates_arr( $array )
-		{
-			return array_unique( array_diff_assoc( $array, array_unique( $array ) ) );
-		}
-		$DuplicateRate    = get_duplicates_arr( $rateNewArr );
+	    function get_duplicates_arr( $array )
+	    {
+		    return array_unique( array_diff_assoc( $array, array_unique( $array ) ) );
+	    }
+	    $DuplicateRate    = get_duplicates_arr( $rateNewArr );
 
-		if(count($DuplicateRate) > 0)
-		{
-			$value = $this->getOldValue();
-			throw new Exception('There is already an entry for this Tax rate.');			
-		}
+	    if(count($DuplicateRate) > 0)
+	    {
+		    $value = $this->getOldValue();
+		    throw new Exception('There is already an entry for this Tax rate.');			
+	    }
 		
         $this->setValue($value);
         parent::_beforeSave();

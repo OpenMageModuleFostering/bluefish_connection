@@ -24,7 +24,7 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 	 */
 	protected function _prepareCollection() {
 		$collection = Mage::getModel('cron/schedule')->getCollection();
-		$collection->addFieldToFilter('job_code',array('in'=>array("bluefish_connection_category","bluefish_connection_customer","bluefish_connection_customerexport","bluefish_connection_orderexport","bluefish_connection_product","bluefish_connection_stock")));
+		$collection->addFieldToFilter('job_code',array('in'=>array("bluefish_connection_category","bluefish_connection_customer","bluefish_connection_customerexport","bluefish_connection_orderexport","bluefish_connection_orderimport","bluefish_connection_product","bluefish_connection_stock")));
 		$this->setCollection($collection);
 		return parent::_prepareCollection();
 	}
@@ -103,7 +103,7 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 		$this->getCollection()->addStoreFilter($value);
 	}
 	
-	public function decorateMessages($value, Bluefish_Connection_Model_Bluestorescheduler $row) {
+	public function decorateMessages($value, $row) {
 		$return = '';
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 		$prefix 	= Mage::getConfig()->getTablePrefix();		
@@ -125,8 +125,8 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 		return $return;
 	}
 
-	public function decorateStatus($value, Bluefish_Connection_Model_Bluestorescheduler $row) {
-		
+	public function decorateStatus($value, $row) {
+
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
@@ -139,8 +139,7 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 			$resultCronScheduleMSG = $connection->query("SELECT status FROM ".$prefix."cron_schedule WHERE schedule_id = '".$row->getScheduleId()."'");
 			$resultSetScheduleID = $resultCronScheduleMSG->fetchAll(PDO::FETCH_ASSOC);		
 
-			$status = $resultSetScheduleID[0][status];
-			$errorMSG = $resultSetScheduleID[0][message];
+			$status = $resultSetScheduleID[0]['status'];
 		}
 		else
 		{
@@ -148,23 +147,23 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 		}
 
 		switch ($status) {
-			case success:
+			case "success":
 				$class = 'notice';
 				$result = $status;
 				break;
-			case pending:
+			case "pending":
 				$class = 'minor';
 				$result = $status;
 				break;
-			case running:
+			case "running":
 				$class = 'minor';
 				$result = $status;
 				break;
-			case missed:
+			case "missed":
 				$class = 'major';
 				$result = $status;
 				break;
-			case error:
+			case "error":
 				$class = 'critical';
 				$result = $status;
 				break;

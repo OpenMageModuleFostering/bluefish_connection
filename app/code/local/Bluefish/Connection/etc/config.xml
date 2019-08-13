@@ -2,7 +2,13 @@
 <config>
     <modules>
         <Bluefish_Connection>
-            <version>1.1.2</version>
+            <version>1.1.3</version>
+	    <depends>
+		<Mage_Shipping/>
+	    </depends>
+            <depends>
+                <Mage_Payment/>
+            </depends>	    
         </Bluefish_Connection>
     </modules>
     <frontend>
@@ -25,13 +31,13 @@
     </frontend>
     <admin>
         <routers>
-			<connection>
-				<use>admin</use>
-				<args>
-					<module>Bluefish_Connection</module>
-					<frontName>bluefish</frontName>
-				</args>
-			</connection>
+	    <connection>
+		    <use>admin</use>
+		    <args>
+			    <module>Bluefish_Connection</module>
+			    <frontName>bluefish</frontName>
+		    </args>
+	    </connection>
         </routers>
     </admin>
     <adminhtml>
@@ -59,7 +65,12 @@
 						<title>Monitor Scheduled Tasks</title>
 						<sort_order>40</sort_order>
 						<action>connection/adminhtml_bluestorescheduler</action>
-					</monitorcron>						
+					</monitorcron>
+					<errorsaleimport module="connection">
+					      <title>Sales Import Error</title>
+					      <sort_order>50</sort_order>
+					      <action>connection/adminhtml_errorsaleimport</action>
+					</errorsaleimport>					
 				</children>
      		</connection>
 		</menu>
@@ -88,6 +99,13 @@
     </adminhtml>   
     <global>
         <models>
+
+          <core>
+              <rewrite>
+                  <store>Bluefish_Connection_Model_Store</store>
+              </rewrite>
+          </core>
+
             <connection>
                 <class>Bluefish_Connection_Model</class>
                 <resourceModel>connection_mysql4</resourceModel>
@@ -111,7 +129,10 @@
                     <connection1>
                         <table>bluefish_sale_post</table>
                     </connection1>
-		        </entities>
+		    <errorsaleimport>
+			<table>bluefish_import_error_logs</table>
+		    </errorsaleimport>		    
+		</entities>
             </connection_mysql4>
         </models>
         <resources>
@@ -148,30 +169,34 @@
 	<crontab>
 	<jobs>
             <bluefish_connection_category>
-                <schedule><cron_expr>50 14 * * *</cron_expr></schedule>
+                <schedule><cron_expr>52 8 * * *</cron_expr></schedule>
                 <run><model>connection/observer::categoryImport</model></run>
             </bluefish_connection_category>
-			<bluefish_connection_product>
-                <schedule><cron_expr>50 14 * * *</cron_expr></schedule>
+	    <bluefish_connection_product>
+                <schedule><cron_expr>2 10 * * *</cron_expr></schedule>
                 <run><model>connection/observer::productImport</model></run>
             </bluefish_connection_product>
-			<bluefish_connection_stock>
+	    <bluefish_connection_stock>
                 <schedule><cron_expr>27 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::stockImport</model></run>
             </bluefish_connection_stock>
-			<bluefish_connection_customer>
+	    <bluefish_connection_customer>
                 <schedule><cron_expr>44 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::customerImport</model></run>
             </bluefish_connection_customer>
- 			<bluefish_connection_customerexport>
+ 	    <bluefish_connection_customerexport>
                 <schedule><cron_expr>44 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::customerExport</model></run>
             </bluefish_connection_customerexport>
-  			<bluefish_connection_orderexport>
-                <schedule><cron_expr>50 7 * * *</cron_expr></schedule>
+  	    <bluefish_connection_orderimport>
+                <schedule><cron_expr>55 12 * * *</cron_expr></schedule>
+                <run><model>connection/observer::salesImport</model></run>
+            </bluefish_connection_orderimport>			
+  	    <bluefish_connection_orderexport>
+                <schedule><cron_expr>55 12 * * *</cron_expr></schedule>
                 <run><model>connection/observer::salesExport</model></run>
             </bluefish_connection_orderexport>
-    </jobs>
+	</jobs>
 	</crontab>
 
 	<default>
@@ -189,13 +214,27 @@
     		</mycustom_sales_group>
     	</mycustom_section>
     </default>	
-	<default>
+    <default>
     	<mycustom_section>
     		<mycustom_sales_group>
     			<mycustom_sale_chargescode>1</mycustom_sale_chargescode>
     		</mycustom_sales_group>
     	</mycustom_section>
-    </default>		
+    </default>
+    <default>
+    	<mycustom_section>
+    		<mycustom_sales_group>
+    			<mycustom_customer_idimport>1</mycustom_customer_idimport>
+    		</mycustom_sales_group>
+    	</mycustom_section>
+    </default>    
+    <default>
+    	<mycustom_section>
+    		<mycustom_sales_group>
+    			<mycustom_bluestore_enddatetime>2014-01-01 00:00</mycustom_bluestore_enddatetime>
+    		</mycustom_sales_group>
+    	</mycustom_section>
+    </default>	    
 	
 	<default>
     	<mycustom_section>
@@ -239,6 +278,30 @@
     			<mycustom_payment_cc>11</mycustom_payment_cc>
     		</mycustom_payment_group>
     	</mycustom_section>
-    </default>	
-	
+    </default>
+
+       <default>
+        <carriers>
+          <bluefish_connection>
+               <active>1</active>
+               <model>connection/carrier_bsaleshippingmethod</model>
+               <title>Carrier Title</title>
+               <name>bluestore_no_shipping</name>
+               <price>0.00</price>
+               <specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
+            </bluefish_connection>
+         </carriers>
+       </default>
+
+<default>
+    <payment>
+        <bluefish_connection>
+            <active>1</active>
+            <model>connection/paymentmethod</model>
+            <order_status>processing</order_status>
+            <title>Bluestore Paid</title>
+        </bluefish_connection>
+     </payment>
+</default>
+
 </config>

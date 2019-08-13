@@ -93,5 +93,12 @@ class Bluefish_Connection_Model_Observer extends Bluefish_Connection_Adminhtml_M
     {
 		$this->postAction('7');
     }
+	public function salesImport()	 ### This Function is used for sale Export
+    {
+		if ($this->isDisabled('bluefish_connection_orderimport')) {
+			die();
+		}		
+		$this->postAction('8');
+    }    
 }
 ?>

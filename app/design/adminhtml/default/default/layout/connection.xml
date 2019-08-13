@@ -19,5 +19,10 @@
         <reference name="content">
             <block type="connection/adminhtml_bluestorescheduler" name="bluestorescheduler" />
         </reference>
-    </connection_adminhtml_bluestorescheduler_index>	
+    </connection_adminhtml_bluestorescheduler_index>
+  <connection_adminhtml_errorsaleimport_index>
+	<reference name="content">
+	  <block type="connection/adminhtml_errorsaleimport" name="errorsaleimport" />
+	</reference>
+  </connection_adminhtml_errorsaleimport_index>
 </layout>

@@ -36,54 +36,57 @@ class Bluefish_Connection_Model_Validationpaymentmap extends Mage_Adminhtml_Mode
      */
     protected function _beforeSave()
     {
-		$oldvalue = $this->getOldValue();
-		$unserielVal = unserialize($oldvalue);
+	    $oldvalue = $this->getOldValue();
+	    $unserielVal = unserialize($oldvalue);
 
-		foreach($unserielVal as $oldpaymentmap)
-		{	
-			$paymentmethodArr[]   = $oldpaymentmap['paymentmethod'];
-			$bluestorecodeArr[]   = $oldpaymentmap['bluestorecode'];					
-		}	
+	    foreach($unserielVal as $oldpaymentmap)
+	    {	
+		    $paymentmethodArr[]   = $oldpaymentmap['paymentmethod'];
+		    $bluestorecodeArr[]   = $oldpaymentmap['bluestorecode'];					
+	    }	
 	   
 	   $value = $this->getValue();
        
-		if (is_array($value)) {
-            unset($value['__empty']);
-        }
+	    if (is_array($value)) {
+	         unset($value['__empty']);
+	    }
 		
-		foreach($value as $keypayment => $valuepayment)
-		{
-			$paymentmethodNewArr[]   = $valuepayment['paymentmethod'];
-			#$bluestorecodeNewArr[]   = $valuepayment['bluestorecode'];			
-			if(($valuepayment['paymentmethod'] == "") && ($valuepayment['bluestorecode'] == ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Payment method and Bluestore code are required.');
-			}
-			if(($valuepayment['paymentmethod'] == "") && ($valuepayment['bluestorecode'] != ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Payment method is required.');
-			}	
-			if(($valuepayment['paymentmethod'] != "") && ($valuepayment['bluestorecode'] == ""))
-			{
-				$value = $this->getOldValue();
-				throw new Exception('Bluestore payment method code is required.');
-			}
-		}
+	    foreach($value as $keypayment => $valuepayment)
+	    {
+		    $paymentmethodNewArr[]   = $valuepayment['paymentmethod'];
+	
+		    if(($valuepayment['paymentmethod'] == "") && ($valuepayment['bluestorecode'] == ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Payment method and Bluestore code are required.');
+		    }
+		    if(($valuepayment['paymentmethod'] == "") && ($valuepayment['bluestorecode'] != ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Payment method is required.');
+		    }	
+		    if(($valuepayment['paymentmethod'] != "") && ($valuepayment['bluestorecode'] == ""))
+		    {
+			    $value = $this->getOldValue();
+			    throw new Exception('Bluestore payment method code is required.');
+		    }
+	    }
 		
-		function get_duplicates( $array )
-		{
-			return array_unique( array_diff_assoc( $array, array_unique( $array ) ) );
-		}
-		
-		$DuplicatePaymentMethod = get_duplicates( $paymentmethodNewArr );
-		
-		if(count($DuplicatePaymentMethod) > 0)
-		{
-			$value = $this->getOldValue();
-			throw new Exception('There is already an entry for this payment method.');					
-		}
+	    function get_duplicates( $array )
+	    {
+		    return array_unique( array_diff_assoc( $array, array_unique( $array ) ) );
+	    }
+	    
+	    if(count($paymentmethodNewArr) > 0)
+	    {
+		 $DuplicatePaymentMethod = get_duplicates( $paymentmethodNewArr );	
+	    }
+	    
+	    if(count($DuplicatePaymentMethod) > 0)
+	    {
+		    $value = $this->getOldValue();
+		    throw new Exception('There is already an entry for this payment method.');					
+	    }
 
         $this->setValue($value);
         parent::_beforeSave();

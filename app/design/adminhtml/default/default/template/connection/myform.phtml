@@ -47,6 +47,12 @@ function checkForm(form)
 					<td class="label"><input value="" type="text" name="customercode" placeholder="customer code"></td>		
                     <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="4" type="button"><span>Import</span></button></td>
                 </tr>
+                </tr>
+		<tr>
+                    <td class="label"><?php echo $this->__('Sales')?> </td>
+					<td class="label"><input value="" type="text" name="transactioncode" placeholder="Transaction code"></td>		
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="8" type="button"><span>Import</span></button></td>
+                </tr>				
 		    </table>
 			<i>Bluestore Data Exchange is configured in System - Configuration under Services - Bluestore Live.</i>
         </fieldset>
