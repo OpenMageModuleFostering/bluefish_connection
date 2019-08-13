@@ -1476,6 +1476,7 @@ function importBluestoreSales($transactionNumber)
 						
 						if ($customerCode == "") {
 							$customerGuest = Mage::getModel('customer/customer')->load($guestCustomerCode);
+							
 							$customerAddress = array();
 				
 							foreach ($customerGuest->getAddresses() as $address)
@@ -2682,7 +2683,7 @@ function ExportProductData()
 		{
 			### For Product info
 			$productInfo = $soap->call($sessionId,'catalog_product.info',$productList[$i][entity_id]);
-
+			
 			$docNO = $zz+1;
 			$typeCode = "";
 
@@ -2704,6 +2705,7 @@ function ExportProductData()
 			$ProductStatus         = "";
 			$startDate             = "";
 			$productDescription    = "";
+			$barcode               = "";
 			
 			$resultCategory  = $connection->query("select code from ".$prefix."bluefish_category WHERE category_id = '".$productInfo[categories]['0']."'");
 			$dataCategory    = $resultCategory->fetchAll(PDO::FETCH_ASSOC);
@@ -2748,7 +2750,8 @@ function ExportProductData()
 
 
 						    $xmlRequest .=
-								"<typeCode>".$typeCode."</typeCode>
+								"<barcode>".$productInfo[barcode]."</barcode>
+								<typeCode>".$typeCode."</typeCode>
 								<categoryCode>".$bluestoreCategoryCode."</categoryCode>
 								<taxClassCode>".$taxClassCode."</taxClassCode>
 								<active>".$ProductStatus."</active>
@@ -2768,6 +2771,7 @@ function ExportProductData()
 							</product>
 						</products>
 					</batch>";
+
 			$arrayXml[] = $xmlRequest;
 			$zz++;			
 		}

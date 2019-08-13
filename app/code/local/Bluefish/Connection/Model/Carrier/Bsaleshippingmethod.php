@@ -5,8 +5,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
  
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-
-       if((strpos($_SERVER['REQUEST_URI'] ,"/onestepcheckout/") !== false) || (strpos($_SERVER['REQUEST_URI'] ,"/checkout/cart/") !== false) || (strpos($_SERVER['PATH_INFO'] ,"/checkout/onepage/saveBilling/") !== false) || (strpos($_SERVER['PATH_INFO'] ,"/checkout/cart/") !== false)){
+       if((strpos(@$_SERVER["REQUEST_URI"] ,"/onestepcheckout/") !== false) || (strpos(@$_SERVER["REQUEST_URI"] ,"/checkout/cart/") !== false) || (strpos(@$_SERVER["PATH_INFO"] ,"/checkout/onepage/saveBilling/") !== false) || (strpos(@$_SERVER["PATH_INFO"] ,"/checkout/cart/") !== false)){
             return false;
         }      
     

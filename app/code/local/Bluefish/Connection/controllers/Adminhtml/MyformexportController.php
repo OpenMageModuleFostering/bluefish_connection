@@ -65,10 +65,10 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 				curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 				curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 				curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-				curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//				curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 				curl_setopt($tuCurl, CURLOPT_POST, 1);
 				curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $xml);
-				curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//				curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 				curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 				curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -184,11 +184,11 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 						curl_setopt($tuCurl, CURLOPT_POST, 1);
 						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
 						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $custXmlData);
-						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -289,11 +289,11 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 						curl_setopt($tuCurl, CURLOPT_POST, 1);
 						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
 						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $productXmlData);
-						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -751,7 +751,13 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 						$unserielTaxClass     = unserialize($taxClassSerialArr);
 
 						$credentialsExport    = Mage::getStoreConfig('mycustom_section/mycustom_product_export_group');
-						$unitOfMeasureCode    = $credentialsExport['mycustom_unitofmeasure'];						
+						$unitOfMeasureCode    = $credentialsExport['mycustom_unitofmeasure'];
+						
+			
+						$productsMappingFlag  = $credentialsExport['mycustom_magento_producttype'];
+						$unserielValProductType = unserialize($productsMappingFlag);
+			
+						
 						
 						$fileName   = "product_dump_".date('Y-m-d').".csv";
 						$fileHandle = fopen($fileName, "w");
@@ -765,7 +771,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 						$productObj = Mage::getModel('catalog/product')->getCollection()->addAttributeToSelect('*'); // you can add * or field name here eg. ('sku','product_name','description')
 						
 						foreach ($productObj as $productRow) {
-							
+				
 							foreach($unserielTaxClass as $key => $valueTax)
 							{
 								if($productRow->getTaxClassId() == $valueTax['magentotaxclass'])
@@ -789,13 +795,21 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 							
 							$createdDate   = date("d.m.Y",strtotime($productRow->getCreatedAt()));
 							
+							foreach($unserielValProductType as $keyproducttype => $valproducttype)
+							{
+								if($productRow->getTypeId() == $valproducttype['magentoproducttype'])
+								{
+									$productTypeCode = $valproducttype['bluestoreproducttype'];
+								}
+							}							
+							
 						        $dataCollection = array(
 									"INSTANCE",
 									'',
 									"true",
 									$productCategory,
 									$productCode,
-									"Standard",
+									$productTypeCode,
 									$bluestoreTaxclassCode,
 									$ProductStatus,
 									$unitOfMeasureCode,

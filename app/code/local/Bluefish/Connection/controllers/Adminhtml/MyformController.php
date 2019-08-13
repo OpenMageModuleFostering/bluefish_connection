@@ -325,10 +325,10 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 				curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 				curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-				curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//				curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 				curl_setopt($tuCurl, CURLOPT_POST, 1);
 				curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $xml);
-				curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//				curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 				curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 				curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -469,11 +469,11 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 						curl_setopt($tuCurl, CURLOPT_POST, 1);
 						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
 						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $custXmlData);
-						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -609,11 +609,11 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 						curl_setopt($tuCurl, CURLOPT_POST, 1);
 						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
 						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $productXmlData);
-						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
@@ -722,9 +722,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -741,9 +741,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -792,9 +792,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -843,9 +843,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 							curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 							curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 							curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-							curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//							curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 							curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-							curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//							curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 							curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 							curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 							curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -883,9 +883,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 						curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 						curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -968,9 +968,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -988,9 +988,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -1045,9 +1045,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -1068,9 +1068,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);					
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -1115,7 +1115,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				if(isset($extra) && !empty($extra))
 				{
 					$array=array();
-					$array=array('where'=>rawurlencode('storeCode <> '.$extraStoreCode.' and transactionCode = '.$extra.''));
+					$array=array('where'=>rawurlencode('storeCode = '.$extraStoreCode.' and transactionCode = '.$extra.''));
 					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
 					
 					$auth_query = _build_http_query($auth);
@@ -1124,9 +1124,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
@@ -1137,7 +1137,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				else
 				{
 					$array=array();
-					$array=array('where'=>rawurlencode('storeCode <> '.$extraStoreCode.' and endDateTime >= '.'"'.$endDateTime.'"'.''));			
+					$array=array('where'=>rawurlencode('storeCode = '.$extraStoreCode.' and endDateTime >= '.'"'.$endDateTime.'"'.''));			
 					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
 					$auth_query = _build_http_query($auth);
 					$auth_query = $baseurl."?".$auth_query;
@@ -1145,9 +1145,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+//					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
 					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+//					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));

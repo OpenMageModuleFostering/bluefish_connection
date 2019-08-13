@@ -5,7 +5,7 @@
          
 
         public function isAvailable($quote = null) {
-            if($_SERVER['PATH_INFO'] == "/checkout/onepage/saveShippingMethod/"){
+            if(@$_SERVER["PATH_INFO"] == "/checkout/onepage/saveShippingMethod/"){
                  return false;
              }
              return true;

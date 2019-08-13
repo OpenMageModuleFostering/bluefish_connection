@@ -188,7 +188,7 @@
 	<crontab>
 	<jobs>
             <bluefish_connection_category>
-                <schedule><cron_expr>22 9 * * *</cron_expr></schedule>
+                <schedule><cron_expr>38 15 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::categoryImport</model></run>
             </bluefish_connection_category>
 	    <bluefish_connection_product>
@@ -200,7 +200,7 @@
                 <run><model>connection/cronobserver::productEmport</model></run>
             </bluefish_connection_productexport>	    
 	    <bluefish_connection_stock>
-                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <schedule><cron_expr>0 * * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::stockImport</model></run>
             </bluefish_connection_stock>
 	    <bluefish_connection_customer>
@@ -212,11 +212,11 @@
                 <run><model>connection/cronobserver::customerExport</model></run>
             </bluefish_connection_customerexport>
   	    <bluefish_connection_orderimport>
-                <schedule><cron_expr>25 15 * * *</cron_expr></schedule>
+                <schedule><cron_expr>35 8 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::salesImport</model></run>
             </bluefish_connection_orderimport>			
   	    <bluefish_connection_orderexport>
-                <schedule><cron_expr>25 15 * * *</cron_expr></schedule>
+                <schedule><cron_expr>35 8 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::salesExport</model></run>
             </bluefish_connection_orderexport>
 	</jobs>
