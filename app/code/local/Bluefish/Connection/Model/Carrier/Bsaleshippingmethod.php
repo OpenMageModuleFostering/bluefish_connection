@@ -5,21 +5,16 @@ implements Mage_Shipping_Model_Carrier_Interface {
  
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-       if($_SERVER['PATH_INFO'] == "/checkout/onepage/saveBilling/"){
+
+       if((strpos($_SERVER['REQUEST_URI'] ,"/onestepcheckout/") !== false) || (strpos($_SERVER['REQUEST_URI'] ,"/checkout/cart/") !== false) || (strpos($_SERVER['PATH_INFO'] ,"/checkout/onepage/saveBilling/") !== false) || (strpos($_SERVER['PATH_INFO'] ,"/checkout/cart/") !== false)){
             return false;
         }      
     
-        /*// Don't want to display on fronend
-       if(Mage::getDesign()->getArea() === Mage_Core_Model_App_Area::AREA_FRONTEND &&
-                !Mage::getStoreConfig('carriers/'.$this->_code.'/show_frontend')){
-        
-                return false;
-            }
-        
         // skip if not enabled
 	if(!Mage::getStoreConfig('carriers/'.$this->_code.'/active')) {
             return false;
-        }*/
+        }
+ 
  
         $handling = Mage::getStoreConfig('carriers/'.$this->_code.'/handling');
         $result = Mage::getModel('shipping/rate_result');

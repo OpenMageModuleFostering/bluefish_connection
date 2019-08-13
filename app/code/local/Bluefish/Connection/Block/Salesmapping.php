@@ -31,43 +31,44 @@
  * @package    Mage_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Bluefish_Connection_Block_Databasemapping extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
+class Bluefish_Connection_Block_Salesmapping extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
 {
     protected $magentoAttributes;
  
     public function __construct()
     {
-        $this->addColumn('Dbmapping', array(
+        $this->addColumn('Salemapping', array(
             'label' => Mage::helper('adminhtml')->__(' '),
             'size'  => 28,
         ));
  
         parent::__construct();
-        $this->setTemplate('connection/custom_radioinput.phtml');
+        $this->setTemplate('connection/salesmapping_radioinput.phtml');
     }
  
     protected function _renderCellTemplate($columnName)
     {
-        $credentialsCategory   = Mage::getStoreConfig('mycustom_section/mycustom_category_group');
-	$categorymappingFlag   = $credentialsCategory['mycustom_category_mapping_direct'];
-	$unserielVal 	       = unserialize($categorymappingFlag);
-	$numberRows            = count($unserielVal);			
+        $credentialsSales  = Mage::getStoreConfig('mycustom_section/mycustom_sales_import_group');
+	$salemappingFlag   = $credentialsSales['mycustom_sales_mapping_method'];
+	$unserielVal 	   = unserialize($salemappingFlag);
+	$numberRows        = count($unserielVal);	
 		
 	if($numberRows > 0)
 	{
-		$checkbox_Direct  = ($unserielVal['#{_id}']['Dbmapping'] == 'Direct')?'checked':'unchecked';
-		$checkbox_Mapping = ($unserielVal['#{_id}']['Dbmapping'] == 'Mapping')?'checked':'unchecked';
+		$checkbox_Direct  = ($unserielVal['#{_id}']['Salemapping'] == 'Productcode')?'checked':'unchecked';
+		$checkbox_Mapping = ($unserielVal['#{_id}']['Salemapping'] == 'Magentoid')?'checked':'unchecked';
 	}
 	else
 		$checkbox_Direct = 'checked';
 
+		
         if (empty($this->_columns[$columnName])) {
             throw new Exception('Wrong column name specified.');
         }
         $column     = $this->_columns[$columnName];
         $inputName  = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
  
-         $rendered = 'Direct Mapping <input type="radio" name="'.$inputName.'" value="Direct" onclick="getdetails_related(\'Direct\')" '.$checkbox_Direct.' id="Direct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mapping Table <input type="radio" name="'.$inputName.'" value="Mapping" onclick="getdetails_related(\'Mapping\')" '.$checkbox_Mapping.' id="Mapping" >';
+         $rendered = 'SKU Mapping <input type="radio" name="'.$inputName.'" value="Productcode" '.$checkbox_Direct.' id="Productcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Product ID Mapping <input type="radio" name="'.$inputName.'" value="Magentoid" '.$checkbox_Mapping.' id="Magentoid" >';
          return $rendered;
     }
 }

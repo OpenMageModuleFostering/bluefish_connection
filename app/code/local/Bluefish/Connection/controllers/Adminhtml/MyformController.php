@@ -11,19 +11,20 @@ include("Xml.php");
 class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Controller_Action
 {
 	public static $flag = 0;
-	#### Bluestore Live Path For GET and POST Data
-	const CATEGORY 		  = 'https://bluestorelive.com:9001/rest/category/';
-	const PRODUCT  		  = 'https://bluestorelive.com:9001/rest/product/';
-	const STOCK    		  = 'https://bluestorelive.com:9001/rest/stock/';
+	#### Bluestore Live/QA Path For GET and POST Data
+	const CATEGORY 	      = 'https://bluestorelive.com:9001/rest/category/';
+	const PRODUCT  	      = 'https://bluestorelive.com:9001/rest/product/';
+	const STOCK    	      = 'https://bluestorelive.com:9001/rest/stock/';
 	const CUSTOMER        = 'https://bluestorelive.com:9001/rest/customer/';
-	const ORDERPOST    	  = 'https://bluestorelive.com:9001/rest/inbound/';
+	const ORDERPOST       = 'https://bluestorelive.com:9001/rest/inbound/';
 	const CUSTOMERPOST    = 'https://bluestorelive.com:9001/rest/inbound/';
-	const SALEIMPORT    = 'https://bluestorelive.com:9001/rest/sale/';
+	const SALEIMPORT      = 'https://bluestorelive.com:9001/rest/sale/';
+	const PRODUCTPOST     = "https://bluestorelive.com:9001/rest/inbound/";		
 	
-    public function indexAction()
-    {
-        $this->loadLayout()->renderLayout();
-    }
+	public function indexAction()
+	{
+	    $this->loadLayout()->renderLayout();
+	}
 	
 	### Function For Write Bluestore Category Data into categories_bluefish.xml File
 	public function xmlAction($response)
@@ -224,7 +225,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 	}
 	
 	### Function For Write Bluestore Sale Data into sales_bluestore.xml File
-	public function xmlActionSale($response)
+	public function xmlActionSale($response,$transactioncode)
 	{
 		$appBaseDir = Mage::getBaseDir();
 		$xmlFiles = $appBaseDir."/sales_bluestore_import.xml";
@@ -254,7 +255,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			}
 			else
 			{
-				$result_database = importBluestoreSales();
+				$result_database = importBluestoreSales($transactioncode);
 				if($result_database == "fail")
 				{
 					$this->flag=6;
@@ -407,94 +408,261 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			else
 			{
 				$custRdata        = $appBaseDir."/customer_bluestore_request.xml";
-				$cfrequest 		  = fopen($custRdata, 'w+');
-				fwrite($cfrequest, $xml);
+				$cfrequest        = fopen($custRdata, 'w+');
+				ob_start();
+				echo "<pre>"; 
+				print_r($xml);
+				$previousdata =ob_get_contents();
+				ob_clean();
+				
+				fwrite($cfrequest, $previousdata);
 				fclose($cfrequest);
-				
-				$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,'','POST');
-				$auth2 = build_auth_string($auth);
 
-				$auth_query = $baseurl;
-				
-				$header = array(
-				'Accept: application/xml',
-				'Content-Type: application/xml',
-				'Expect:'
-				);
-				$header = array_merge($auth2,$header);
-				
-				$tuCurl = curl_init();
-				curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
-				curl_setopt($tuCurl, CURLOPT_PORT , 9001);
-				curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-				curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
-				curl_setopt($tuCurl, CURLOPT_POST, 1);
-				curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $xml);
-				curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
-				curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
-				curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
-				curl_setopt($tuCurl, CURLOPT_HTTPHEADER,$header);
-				$response = curl_exec($tuCurl);
-				$response1 = curl_getinfo( $tuCurl );	
-				
-				$customerBluestore   = $appBaseDir."/customer_bluestore_response.xml";
-				$fcustomer 			 = fopen($customerBluestore, 'w+');
-				fwrite($fcustomer, $response);
-				fclose($fcustomer);
-				
-				$xmlObj  = new Varien_Simplexml_Config($response);
-				$xmlData = $xmlObj->getNode();
-
-				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-				$prefix 	= Mage::getConfig()->getTablePrefix();
-				
-				$ResposeData    = $xmlData->transactionsBatch;
-				
-				$countSuccess = 0;
-				foreach($ResposeData as $row)
+				if(count($xml) > 0)
 				{
-					if($row->batchSuccess == "true")
-					{
-						$code 			= strval($row->transaction['docNo']);
-						$bluestoreRef	= $row->transaction->bluestoreRef;
-						$CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET  customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
-						$countSuccess++;
-					}
-					else
-					{
-						$ErrorMsg  .= $row->transaction->message.":";
-					}					 
-				}
-				if($ErrorMsg != "" || $xmlData->message !="")
-				{
-					$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_customerexport' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
-					$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+					$connection     = Mage::getSingleton('core/resource')->getConnection('core_write');
+					$prefix 	= Mage::getConfig()->getTablePrefix();				
 					
-					$ScheduledID = $resultSetScheduleID[0]->schedule_id;
-					$numberRows = count($resultSetScheduleID);	
-					
-					if($numberRows > 0)
+					$chunksize = 100;
+					$finalData=  array_chunk($xml,$chunksize);
+					$enterprise_code = '';
+				
+					foreach($finalData as $datas)
 					{
-						if($ErrorMsg == "")
-							$ErrorMsg = addslashes($xmlData->message);
-						else
-							$ErrorMsg    = str_ireplace("'",'',$ErrorMsg);
-							
-						$cronStatus  = ($countSuccess > 0)?'success':'error';
+						$custXmlData = "";
+						$finalstring = implode("",$datas);
 						
-						$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
-												 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+						$custXmlData = "<?xml version=\"1.0\"?>
+							<inbound lang=\"en\" enterprise=\"".$enterprise_code."\" requestNo=\"1\">".$finalstring."</inbound>";
+						
+						$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,'','POST');
+						$auth2 = build_auth_string($auth);
+		
+						$auth_query = $baseurl;
+						
+						$header = array(
+						'Accept: application/xml',
+						'Content-Type: application/xml',
+						'Expect:'
+						);
+						$header = array_merge($auth2,$header);
+						
+						$tuCurl = curl_init();
+						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+						curl_setopt($tuCurl, CURLOPT_POST, 1);
+						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
+						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $custXmlData);
+						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
+						curl_setopt($tuCurl, CURLOPT_HTTPHEADER,$header);
+						$response = curl_exec($tuCurl);
+						$response1 = curl_getinfo( $tuCurl );
+						
+						if($response1['http_code'] == "200")
+						{
+							$customerBluestore   = $appBaseDir."/customer_bluestore_response.xml";
+							$fcustomer 	     = fopen($customerBluestore, 'w+');
+							fwrite($fcustomer, $response);
+							fclose($fcustomer);
+							
+							$xmlObj  = new Varien_Simplexml_Config($response);
+							$xmlData = $xmlObj->getNode();	
+			
+							$responseCode   = $xmlData->transactionsBatch->batchSuccess;
+							$ResposeData    = $xmlData->transactionsBatch;
+			
+							$countSuccess = 0;
+							foreach($ResposeData as $row)
+							{
+								if($row->batchSuccess == "true")
+								{
+									$code 		= strval($row->transaction['docNo']);
+									$bluestoreRef	= $row->transaction->bluestoreRef;
+									$CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET  customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
+									$countSuccess++;
+								}
+								else
+								{
+									$ErrorMsg  .= $row->transaction->message.":";
+								}					 
+							}
+							if($ErrorMsg != "" || $xmlData->message !="")
+							{
+								$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_customerexport' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+								$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+								
+								$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+								$numberRows = count($resultSetScheduleID);	
+								
+								if($numberRows > 0)
+								{
+									if($ErrorMsg == "")
+										$ErrorMsg = addslashes($xmlData->message);
+									else
+										$ErrorMsg    = str_ireplace("'",'',$ErrorMsg);
+										
+									$cronStatus  = ($countSuccess > 0)?'success':'error';
+									
+									$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+															 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+								}
+							}
+						}
+						sleep(1);
 					}
-				}	
-				if($countSuccess > 0)
-					$responseCode = "true";
-				else
-					$responseCode = "false";	
+					if($countSuccess > 0)
+						$responseCode = "true";
+					else
+						$responseCode = "false";
+				}
+				else{
+					$responseCode = "blankdata";
+				}
 
-				return $responseCode;				
+				return $responseCode;
 			}
 		}
+		elseif($val == 'productexport')   ### Condition for check the product export data
+		{
+			$baseurl = Bluefish_Connection_Adminhtml_MyformController::PRODUCTPOST;
+			$appBaseDir = Mage::getBaseDir();
+			$permFile   = $appBaseDir."/bluefish_privatekey.PEM";
+			$fh = fopen($permFile, 'w+');
+			fwrite($fh, $credentials['mycustom_certificate']);
+			fclose($fh);
+			if(!file_exists($permFile))
+			{
+				$this->flag=1;
+				return;
+			}
+			else if(!filesize($permFile) > 0)
+			{
+				$this->flag=2;
+				return;
+			}
+			else
+			{
+				$productRdata        = $appBaseDir."/product_export_request.xml";
+				$pfrequest        = fopen($productRdata, 'w+');
+				ob_start();
+				echo "<pre>"; 
+				print_r($xml);
+				$previousdata =ob_get_contents();
+				ob_clean();
+				
+				fwrite($pfrequest, $previousdata);
+				fclose($pfrequest);
+
+				if(count($xml) > 0)
+				{
+					$connection     = Mage::getSingleton('core/resource')->getConnection('core_write');
+					$prefix 	= Mage::getConfig()->getTablePrefix();				
+					
+					$chunksize = 100;
+					$finalData=  array_chunk($xml,$chunksize);
+					$enterprise_code = '';
+				
+					foreach($finalData as $datas)
+					{
+						$productXmlData = "";
+						$finalstring = implode("",$datas);
+						
+						$productXmlData = "<?xml version=\"1.0\"?>
+							<inbound lang=\"en\" enterprise=\"".$enterprise_code."\" requestNo=\"1\">".$finalstring."</inbound>";
+						
+						$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,'','POST');
+						$auth2 = build_auth_string($auth);
+		
+						$auth_query = $baseurl;
+						
+						$header = array(
+						'Accept: application/xml',
+						'Content-Type: application/xml',
+						'Expect:'
+						);
+						$header = array_merge($auth2,$header);
+
+						$tuCurl = curl_init();
+						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+						curl_setopt($tuCurl, CURLOPT_POST, 1);
+						curl_setopt($tuCurl, CURLOPT_TIMEOUT, 0);
+						curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $productXmlData);
+						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+						curl_setopt($tuCurl, CURLINFO_HEADER_OUT, TRUE);
+						curl_setopt($tuCurl, CURLOPT_HTTPHEADER,$header);
+						$response = curl_exec($tuCurl);
+						$response1 = curl_getinfo( $tuCurl );
+
+						if($response1['http_code'] == "200")
+						{
+							$customerBluestore   = $appBaseDir."/product_export_response.xml";
+							$fcustomer 	     = fopen($customerBluestore, 'w+');
+							fwrite($fcustomer, $response);
+							fclose($fcustomer);
+							
+							$xmlObj  = new Varien_Simplexml_Config($response);
+							$xmlData = $xmlObj->getNode();	
+			
+							$responseCode   = $xmlData->transactionsBatch->batchSuccess;
+							$ResposeData    = $xmlData->transactionsBatch;
+			
+							$countSuccess = 0;
+							foreach($ResposeData as $row)
+							{
+								if($row->batchSuccess == "true")
+								{
+									$countSuccess++;
+								}
+								else
+								{
+									$ErrorMsg  .= $row->transaction->message.":";
+								}					 
+							}
+							if($ErrorMsg != "" || $xmlData->message !="")
+							{
+								$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_productexport' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+								$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+								
+								$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+								$numberRows = count($resultSetScheduleID);	
+								
+								if($numberRows > 0)
+								{
+									if($ErrorMsg == "")
+										$ErrorMsg = addslashes($xmlData->message);
+									else
+										$ErrorMsg    = str_ireplace("'",'',$ErrorMsg);
+										
+									$cronStatus  = ($countSuccess > 0)?'success':'error';
+									
+									$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+															 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+								}
+							}
+						}
+						sleep(1);
+					}
+					if($countSuccess > 0)
+						$responseCode = "true";
+					else
+						$responseCode = "false";
+				}
+				else{
+					$responseCode = "blankdata";
+				}
+				return $responseCode;
+			}
+		}				
 	}	
 	
 	#### Function For Getting Data From Bluestore
@@ -575,6 +743,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			$fh = fopen($permFile, 'w');
 			fwrite($fh, $credentials['mycustom_certificate']);
 			fclose($fh);
+			
+			$connection 		 = Mage::getSingleton('core/resource')->getConnection('core_write');
+			$prefix 	         = Mage::getConfig()->getTablePrefix();			
 				
 			if(!file_exists($permFile))
 			{
@@ -611,25 +782,129 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
 					$response = curl_exec($tuCurl);
 					$response1 = curl_getinfo( $tuCurl );
+					
+					$responseValue = $this->xmlAction1($response);
 					return $response;
 				}
 				else
 				{
-					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile);
-					$auth_query = _build_http_query($auth);
-					$auth_query = $baseurl."?".$auth_query;
-					$tuCurl = curl_init();
-					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
-					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
-					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
-					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
-					curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
-					curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
-					curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
-					curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
-					$response = curl_exec($tuCurl);
-					$response1 = curl_getinfo( $tuCurl );
+					$credentialsProductc     = Mage::getStoreConfig('mycustom_section/mycustom_product_group');
+					$productCurrentVersion   = $credentialsProductc['mycustom_currentproductversion'];
+
+					if($productCurrentVersion > 0)
+						$CoreConfigValue  = $productCurrentVersion;
+					else
+						$CoreConfigValue  = '0';
+						
+					$mainVersionVal = ($CoreConfigValue == '0' || $CoreConfigValue == '')?'0':$CoreConfigValue;
+				
+					$updatesversionVal       = array();
+					
+					if($mainVersionVal == '0')
+					{
+						$resultCategory 	 = $connection->query("select code from ".$prefix."bluefish_category");
+						$resultCategoryData      = $resultCategory->fetchAll(PDO::FETCH_ASSOC);
+						$categoryCodeValue       = "";
+						
+						foreach($resultCategoryData as $catcodeVal)
+						{
+							$categoryCodeValue = $catcodeVal['code'];
+							$responseValue     = "";
+							
+							$array=array();
+							
+							if($mainVersionVal == '0')
+							{
+								$array=array('where'=>rawurlencode('categoryCode = '.$categoryCodeValue.''));
+							}
+							else
+							{
+								$array=array('where'=>rawurlencode('version > '.$mainVersionVal.''));
+							}
+							
+							$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
+							
+							$auth_query = _build_http_query($auth);
+							$auth_query = $baseurl."?".$auth_query;					
+							
+							$tuCurl = curl_init();
+							curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+							curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+							curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+							curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+							curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
+							curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+							curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+							curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+							curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
+							$response = curl_exec($tuCurl);
+							$response1 = curl_getinfo( $tuCurl );
+							
+							if($response != "")
+							{
+								$xmlObj  = new Varien_Simplexml_Config($response);
+								$xmlData = $xmlObj->getNode();
+								
+								if(count($xmlData) > 0)
+								{
+									for($i=0;$i<count($xmlData);$i++)
+									{
+										$versionVal	=    $xmlData->product[$i]->version;
+										$updatesversionVal[] = "$versionVal";
+									}
+								}
+								
+								$responseValue = $this->xmlAction1($response);
+							}
+						}
+					}
+					else
+					{
+						$array=array('where'=>rawurlencode('version > '.$mainVersionVal.''));
+						$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
+						
+						$auth_query = _build_http_query($auth);
+						$auth_query = $baseurl."?".$auth_query;					
+						
+						$tuCurl = curl_init();
+						curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+						curl_setopt($tuCurl, CURLOPT_PORT , 9001);
+						curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
+						curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
+						curl_setopt($tuCurl, CURLOPT_HTTPGET, 1);
+						curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, false);
+						curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, 1);
+						curl_setopt($tuCurl, CURLOPT_FOLLOWLOCATION, 1); 
+						curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
+						$response = curl_exec($tuCurl);
+						$response1 = curl_getinfo( $tuCurl );
+						
+						if($response != "")
+						{
+							$xmlObj  = new Varien_Simplexml_Config($response);
+							$xmlData = $xmlObj->getNode();
+							
+							if(count($xmlData) > 0)
+							{
+								for($i=0;$i<count($xmlData);$i++)
+								{
+									$versionVal	=    $xmlData->product[$i]->version;
+									$updatesversionVal[] = "$versionVal";
+								}
+							}
+							
+							$responseValue = $this->xmlAction1($response);
+						}
+						
+						
+					}
+					
+					if(count($updatesversionVal) > 0)
+					{
+						$versionValMax = max($updatesversionVal);
+						Mage::getModel('core/config')->saveConfig('mycustom_section/mycustom_product_group/mycustom_currentproductversion', $versionValMax);
+					}					
+				
 					return $response;
 				}
 			}
@@ -655,20 +930,16 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			}
 			else
 			{
-				$extraStoreCode 	 = $stock_credentials['mycustom_bluestorecode'];
-
-				$connection 		 = Mage::getSingleton('core/resource')->getConnection('core_write');
-				$prefix 			 = Mage::getConfig()->getTablePrefix();
+				$extraStoreCode       = $stock_credentials['mycustom_bluestorecode'];
+			
+				$credentialsStock     = Mage::getStoreConfig('mycustom_section/mycustom_stock_group');
+				$stockCurrentVersion  = $credentialsStock['mycustom_currentstockversion'];
 				
-				$resultCoreConfig 	 = $connection->query("select value from ".$prefix."core_config_data where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
-				$resultSetCoreConfig  = $resultCoreConfig->fetchAll(PDO::FETCH_ASSOC);
-				
-				$numberCoreConfig     = count($resultSetCoreConfig);
-				if($numberCoreConfig > 0)
-					$CoreConfigValue  = $resultSetCoreConfig[0]['value'];
+				if($stockCurrentVersion > 0)
+					$CoreConfigValue  = $stockCurrentVersion;
 				else
 					$CoreConfigValue  = '0';
-					
+				
 				$mainVersionVal = ($CoreConfigValue == '0' || $CoreConfigValue == '')?'-1':$CoreConfigValue;
 			
 				if(isset($extraStoreCode) && !empty($extraStoreCode))
@@ -739,6 +1010,16 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			{
 				$extra = $extraCode;
 
+				$credentialsCustomer     = Mage::getStoreConfig('mycustom_section/mycustom_customer_group');
+				$customerCurrentVersion  = $credentialsCustomer['mycustom_bluestore_customer_version'];
+				
+				if($customerCurrentVersion > 0)
+					$CoreConfigValue  = $customerCurrentVersion;
+				else
+					$CoreConfigValue  = '0';
+				
+				$mainVersionVal = ($CoreConfigValue == '0' || $CoreConfigValue == '')?'0':$CoreConfigValue;
+
 				if(isset($extra) && !empty($extra))
 				{
 					$array=array();
@@ -763,11 +1044,15 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				}
 				else
 				{
-					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile);
+					$array=array();
+					$array=array('where'=>rawurlencode('version > '.$mainVersionVal.''));
+					$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
+					
 					$auth_query = _build_http_query($auth);
 					$auth_query = $baseurl."?".$auth_query;
+					
 					$tuCurl = curl_init();
-					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);
+					curl_setopt($tuCurl, CURLOPT_URL,$auth_query);					
 					curl_setopt($tuCurl, CURLOPT_PORT , 9001);
 					curl_setopt($tuCurl, CURLOPT_VERBOSE, 0);
 					curl_setopt($tuCurl, CURLOPT_SSLVERSION, 3);
@@ -804,7 +1089,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 			{
 				$extra = $extraCode;
 				$stock_credentials = Mage::getStoreConfig('mycustom_section/mycustom_stock_group');
-				$sale_credentials  = Mage::getStoreConfig('mycustom_section/mycustom_sales_group');
+				$sale_credentials  = Mage::getStoreConfig('mycustom_section/mycustom_sales_import_group');
 
 				$extraStoreCode    = $stock_credentials['mycustom_bluestorecode'];
 				$endDateTimeSpace  = explode(" ",$sale_credentials['mycustom_bluestore_enddatetime']);
@@ -1091,7 +1376,6 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						}
 						else
 						{
-							$toXml1 = $this->xmlAction1($response);
 							switch($this->flag)
 							{
 								case 3:
@@ -1684,13 +1968,27 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 								}
 								break;
 							}
-							else if($response != 'true')
+							else if($response == 'false')
 							{
 								$message = $this->__('There was a problem calling the Bluestore API. The data could not be exported. Please contact your site administrator.');
 								Mage::getSingleton('adminhtml/session')->addError($message);
 								Mage::log('The Private Certificate is created', null, './Bluestore_customer_post.log.text');
 								Mage::log('The Private Certificate is populated', null, './Bluestore_customer_post.log.text');
 								Mage::log('Customer Export Failed,No Customer Export', null, './Bluestore_customer_post.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($response == 'blankdata')
+							{
+								$message = $this->__('There is no more customer record for export according to condition.');
+								Mage::getSingleton('adminhtml/session')->addSuccess($message);
+								Mage::log('The Private Certificate is created', null, './Bluestore_customer_post.log.text');
+								Mage::log('The Private Certificate is populated', null, './Bluestore_customer_post.log.text');
+								Mage::log('There is no more customer record for export according to condition', null, './Bluestore_customer_post.log.text');
 								if(!$value_cron)
 								{
 									$this->_redirect('*/*');
@@ -1722,7 +2020,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
 					}
 					break;
-				case 8:	#### This case handles the customer data
+				case 8:	#### This case handles the sale data
 					try
 					{
 							$response = $this->parseAction('saleimport',$transactioncode);
@@ -1770,7 +2068,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 							else
 							{
 								
-								$toXml1 = $this->xmlActionSale($response);
+								$toXml1 = $this->xmlActionSale($response,$transactioncode);
 
 								switch($this->flag)
 								{
@@ -1822,7 +2120,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 
 									case 6:
 										$this->flag = 0;
-										$message = $this->__('All of their records have not imported correctly. Please check all the sales record.');
+										$message = $this->__('All of the records have not imported correctly. Please check the sales import error logs.');
 										Mage::getSingleton('adminhtml/session')->addError($message);
 										Mage::log('The Private Certificate is created', null, './Bluestore_sales_import.log.text');
 										Mage::log('The Private Certificate is populated', null, './Bluestore_sales_import.log.text');
@@ -1875,6 +2173,117 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 										break;
 								}
 							}
+					}
+					catch (Exception $e)
+					{
+						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+					}
+					break;
+			case 9:
+					try
+					{
+						$exportedata = ExportProductData();
+
+						if($exportedata == 'fail')
+						{
+							$message = $this->__('There was a problem with the magento API while fetching data to export. Please contact your site administrator.');
+							Mage::getSingleton('adminhtml/session')->addError($message);
+							Mage::log('Magento is unable to get the data.', null, './Bluestore_productexport.log.text');
+							if(!$value_cron)
+							{
+								$this->_redirect('*/*');
+								break;
+							}
+							break;
+						}
+						else if($exportedata == 'Exist')
+						{
+							$message = $this->__('There is no new product data to export.');
+							Mage::getSingleton('adminhtml/session')->addError($message);
+							Mage::log('Product data already export.', null, './Bluestore_productexport.log.text');
+							if(!$value_cron)
+							{
+								$this->_redirect('*/*');
+								break;
+							}
+							break;
+						}
+						else
+						{
+							$response    = $this->parseXMLForPost('productexport',$exportedata);
+							if($this->flag == 1)
+							{
+								$this->flag = 0;
+								$message = $this->__('There is a problem with the API authentication, the private key file could not be found. Please contact the site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate cannot be created.', null, './Bluestore_productexport.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($this->flag == 2)
+							{
+								$this->flag = 0;
+								$message = $this->__('There is a problem with the API authentication, the private key file does not contain a valid certificate. Please contact the site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate is created.', null, './Bluestore_productexport.log.text');
+								Mage::log('The Private Certificate cannnot be populated.', null, './Bluestore_productexport.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($response == 'false') 
+							{
+								$message = $this->__('There was a problem calling the Bluestore API. The data could not be exported. Please contact your site administrator.');
+								Mage::getSingleton('adminhtml/session')->addError($message);
+								Mage::log('The Private Certificate is created', null, './Bluestore_productexport.log.text');
+								Mage::log('The Private Certificate is populated', null, './Bluestore_productexport.log.text');
+								Mage::log('Product Export Failed, No Product Export', null, './Bluestore_productexport.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else if($response == 'blankdata')
+							{
+								$message = $this->__('There is no more product record for export according to condition.');
+								Mage::getSingleton('adminhtml/session')->addSuccess($message);
+								Mage::log('The Private Certificate is created', null, './Bluestore_productexport.log.text');
+								Mage::log('The Private Certificate is populated', null, './Bluestore_productexport.log.text');
+								Mage::log('There is no more product record for export according to condition', null, './Bluestore_productexport.log.text');
+								if(!$value_cron)
+								{
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+							else
+							{
+								Mage::log('The Private Certificate is created', null, './Bluestore_productexport.log.text');
+								Mage::log('The Private Certificate is populated', null, './Bluestore_productexport.log.text');
+								Mage::log('The Product xml is populated.', null, './Bluestore_productexport.log.text');
+								Mage::log('Product Export Finished Successfully.', null, './Bluestore_productexport.log.text');
+								
+								if(!$value_cron)
+								{
+									$message = $this->__('Products have been successfully exported.');
+									Mage::getSingleton('adminhtml/session')->addSuccess($message);
+									$this->_redirect('*/*');
+									break;
+								}
+								break;
+							}
+						}
+		
 					}
 					catch (Exception $e)
 					{

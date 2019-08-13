@@ -10,35 +10,35 @@
             <tab>service</tab>
             <groups>
                 
-				<mycustom_category_group translate="label">
+		    <mycustom_category_group translate="label">
                     <label>Categories</label>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-						<mycustom_category_defaultminuteschedule translate="label">
+			<mycustom_category_defaultminuteschedule translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
-							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+	        	    <backend_model>bluefish_connection_model_validationcrontime</backend_model>
                             <sort_order>10</sort_order>
-							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when categories will be retrieved from bluestore.]]></comment>
+			    <comment><![CDATA[Add one or more schedule lines to indicate times during the day when categories will be retrieved from bluestore.]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_category_defaultminuteschedule>	
 						
-						<mycustom_category_mapping_direct translate="label">
-                            <label></label>
+			<mycustom_category_mapping_direct translate="label">
+                            <label>Choose One Option</label>
                             <frontend_model>bluefish_connection_block_databasemapping</frontend_model>
-							<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+			    <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_category_mapping_direct>	
 
-					</fields>
+		    </fields>
                 </mycustom_category_group>
 				
 				
@@ -50,46 +50,90 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-						<mycustom_product_commonschedule translate="label">
+			<mycustom_product_commonschedule translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
-							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+			    <backend_model>bluefish_connection_model_validationcrontime</backend_model>
                             <sort_order>2</sort_order>
-							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when products will be retrieved from bluestore.]]></comment>
+			    <comment><![CDATA[Add one or more schedule lines to indicate times during the day when products will be retrieved from bluestore.]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_product_commonschedule>
-						<mycustom_product_mapping_direct translate="label">
-							<label></label>
-							<frontend_model>bluefish_connection_block_productdatabasemapping</frontend_model>
-							<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
-							<sort_order>30</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</mycustom_product_mapping_direct>						
-					</fields>
-                </mycustom_product_group>				
-				
-                <mycustom_stock_group translate="label">
-                    <label>Stock</label>
+			<mycustom_product_mapping_direct translate="label">
+				<label>Choose One Option</label>
+				<frontend_model>bluefish_connection_block_productdatabasemapping</frontend_model>
+				<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+				<sort_order>30</sort_order>
+				<show_in_default>1</show_in_default>
+				<show_in_website>1</show_in_website>
+				<show_in_store>1</show_in_store>
+			</mycustom_product_mapping_direct>
+			<mycustom_currentproductversion translate="label">
+                            <label>Current Product Version</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_currentproductversion>
+		    </fields>
+                </mycustom_product_group>
+		
+                <mycustom_product_export_group translate="label">
+                    <label>Products Export</label>
                     <sort_order>30</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-						<mycustom_stock_commonschedule translate="label">
+                       	<mycustom_product_last_export translate="label">
+                            <label>Last Export of Product Changes</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <comment><![CDATA[(YYYY-MM-DD hh:mm:ss)]]></comment>			    
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_product_last_export>
+			<mycustom_unitofmeasure translate="label">
+                            <label>Default Bluestore Unit of Measure Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_unitofmeasure>
+                       	<mycustom_magento_producttype translate="label">
+                            <label>Manage Product Types</label>
+                            <frontend_model>bluefish_connection_block_bluestoreproducttype</frontend_model>
+			    <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_magento_producttype>
+		    </fields>
+                </mycustom_product_export_group>		
+				
+                <mycustom_stock_group translate="label">
+                    <label>Stock</label>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+			<mycustom_stock_commonschedule translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
-							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+			    <backend_model>bluefish_connection_model_validationcrontime</backend_model>
                             <sort_order>2</sort_order>
-							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when stock will be retrieved from bluestore.]]></comment>
+			    <comment><![CDATA[Add one or more schedule lines to indicate times during the day when stock will be retrieved from bluestore.]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_stock_commonschedule>
-						<mycustom_croninstock translate="label">
+			<mycustom_croninstock translate="label">
                             <label>Min Qty to Display as In Stock</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
@@ -97,7 +141,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_croninstock>						
-						<mycustom_bluestorecode translate="label">
+			    <mycustom_bluestorecode translate="label">
                             <label>Bluestore Store Code</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
@@ -105,7 +149,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_bluestorecode>
-						<mycustom_currentstockversion translate="label">
+			<mycustom_currentstockversion translate="label">
                             <label>Current Stock Version</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>60</sort_order>
@@ -113,32 +157,49 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_currentstockversion>						
-					</fields>
+		    </fields>
                 </mycustom_stock_group>				
 				
                 <mycustom_customer_group translate="label">
                     <label>Customers</label>
-                    <sort_order>40</sort_order>
+                    <sort_order>50</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-						<mycustom_customer_commonschedule translate="label">
+			<mycustom_customer_commonschedule translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
-							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+			    <backend_model>bluefish_connection_model_validationcrontime</backend_model>
                             <sort_order>2</sort_order>
-							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when customers will be synchronised with bluestore.]]></comment>
+             		    <comment><![CDATA[Add one or more schedule lines to indicate times during the day when customers will be synchronised with bluestore.]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_customer_commonschedule>
-					</fields>
+                       	<mycustom_customer_last_export translate="label">
+                            <label>Last Export of Customer Changes</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>3</sort_order>
+                            <comment><![CDATA[(YYYY-MM-DD hh:mm:ss)]]></comment>			    
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_customer_last_export>
+                       	<mycustom_bluestore_customer_version translate="label">
+                            <label>Last Bluestore Customer Version Imported</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_bluestore_customer_version>			
+		    </fields>
                 </mycustom_customer_group>								
 				
                 <mycustom_sales_group translate="label">
                     <label>Sales</label>
-                    <sort_order>50</sort_order>
+                    <sort_order>60</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -177,10 +238,29 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_sale_chargescode>
+                       	<mycustom_sales_last_export translate="label">
+                            <label>Last Export of Completed Sales</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>90</sort_order>
+			    <comment><![CDATA[(YYYY-MM-DD hh:mm:ss)]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_sales_last_export>
+		    </fields>
+                </mycustom_sales_group>					
+				
+                <mycustom_sales_import_group translate="label">
+                    <label>Sales Import</label>
+                    <sort_order>70</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
 			<mycustom_customer_idimport translate="label">
                             <label>Magento Customer Id for Sales Import</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>70</sort_order>
+                            <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -188,18 +268,36 @@
 			<mycustom_bluestore_enddatetime translate="label">
                             <label>Bluestore Last Sale End DateTime</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
+                            <sort_order>20</sort_order>
+			    <comment><![CDATA[(YYYY-MM-DD hh:mm:ss TZ)]]></comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </mycustom_bluestore_enddatetime>			
+                        </mycustom_bluestore_enddatetime>
+			<mycustom_sales_mapping_method translate="label">
+                            <label>Choose One Option For Sale Import</label>
+                            <frontend_model>bluefish_connection_block_salesmapping</frontend_model>
+			    <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_sales_mapping_method>
+			<mycustom_outofstock_mapping translate="label">
+                            <label>Import Sale For Out Of Stock Product</label>
+                            <frontend_model>bluefish_connection_block_outofstocksale</frontend_model>
+			    <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_outofstock_mapping>			
 		    </fields>
-                </mycustom_sales_group>					
-				
-
+                </mycustom_sales_import_group>
+		
                 <mycustom_auth_group translate="label">
                     <label>Authentication</label>
-                    <sort_order>60</sort_order>
+                    <sort_order>80</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -212,7 +310,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_login>
-						<mycustom_password translate="label">
+			    <mycustom_password translate="label">
                             <label>Magento API Password</label>
                             <frontend_type>password</frontend_type>
                             <sort_order>30</sort_order>
@@ -220,7 +318,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_password>
-						<mycustom_code translate="label">
+			    <mycustom_code translate="label">
                             <label>Bluestore API Key</label>
                             <frontend_type>password</frontend_type>
                             <sort_order>40</sort_order>
@@ -228,7 +326,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_code>
-						<mycustom_codeapitoken translate="label">
+			<mycustom_codeapitoken translate="label">
                             <label>Bluestore API Token</label>
                             <frontend_type>password</frontend_type>
                             <sort_order>50</sort_order>
@@ -236,7 +334,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_codeapitoken>
-						<mycustom_certificate translate="label">
+			<mycustom_certificate translate="label">
                             <label>Authentication Certificate - Private Key</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>60</sort_order>
@@ -244,14 +342,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_certificate>
-					</fields>
+		    </fields>
                 </mycustom_auth_group>					
 
 
 
                 <mycustom_taxcode_group translate="label">
                     <label>Bluestore Tax Codes</label>
-                    <sort_order>70</sort_order>
+                    <sort_order>90</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -259,19 +357,19 @@
                        	<mycustom_taxcode_rates translate="label">
                             <label></label>
                             <frontend_model>bluefish_connection_block_bluestoretaxcode</frontend_model>
-							<backend_model>bluefish_connection_model_validationtaxcode</backend_model>
+			    <backend_model>bluefish_connection_model_validationtaxcode</backend_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </mycustom_taxcode_rates>
-					</fields>
+		    </fields>
                 </mycustom_taxcode_group>					
 				
 
                 <mycustom_payment_group translate="label">
                     <label>Bluestore Payment Method Mapping</label>
-                    <sort_order>80</sort_order>
+                    <sort_order>100</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -287,9 +385,10 @@
                         </mycustom_payment_checkmethod>
 		    </fields>
                 </mycustom_payment_group>
-                <mycustom_taxclass_group translate="label">
+               
+	        <mycustom_taxclass_group translate="label">
                     <label>Bluestore Product Tax Class</label>
-                    <sort_order>90</sort_order>
+                    <sort_order>110</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -309,23 +408,23 @@
             </groups>
         </mycustom_section>
 		
-		<system>
-			<groups>
-				<cron translate="label comment" module="cron">
-					<fields>
-						<disabled_crons translate="label">
-							<label>Disabled cron tasks</label>
-							<frontend_type>text</frontend_type>
-							<comment><![CDATA[Do not edit this field manually.]]></comment>
-							<sort_order>100</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-						</disabled_crons>
-					</fields>
-				</cron>
-			</groups>
-		</system>
+	<system>
+	    <groups>
+		<cron translate="label comment" module="cron">
+		    <fields>
+			<disabled_crons translate="label">
+				<label>Disabled cron tasks</label>
+				<frontend_type>text</frontend_type>
+				<comment><![CDATA[Do not edit this field manually.]]></comment>
+				<sort_order>100</sort_order>
+				<show_in_default>1</show_in_default>
+				<show_in_website>0</show_in_website>
+				<show_in_store>0</show_in_store>
+			</disabled_crons>
+		    </fields>
+		</cron>
+	    </groups>
+	</system>
 
         <carriers>
             <groups>
@@ -357,15 +456,23 @@
                         <name translate="label">
                             <label>Method Name</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
+                            <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </name>
+                        <free_shipping_subtotal translate="label">
+                            <label>Minimum order amount</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </free_shipping_subtotal>			
                         <price translate="label">
                             <label>Price</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>3</sort_order>
+                            <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -373,7 +480,7 @@
                         <specificerrmsg translate="label">
                             <label>Displayed Error Message</label>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>4</sort_order>
+                            <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -381,7 +488,7 @@
                         <sallowspecific translate="label">
                             <label>Ship to Applicable Countries</label>
                             <frontend_type>select</frontend_type>
-                            <sort_order>90</sort_order>
+                            <sort_order>7</sort_order>
                             <frontend_class>shipping-applicable-country</frontend_class>
                             <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
                             <show_in_default>1</show_in_default>
@@ -391,7 +498,7 @@
                         <specificcountry translate="label">
                             <label>Ship to Specific Countries</label>
                             <frontend_type>multiselect</frontend_type>
-                            <sort_order>91</sort_order>
+                            <sort_order>8</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -444,6 +551,5 @@
                 </bluefish_connection>
             </groups>
         </payment>
-
     </sections>
 </config>

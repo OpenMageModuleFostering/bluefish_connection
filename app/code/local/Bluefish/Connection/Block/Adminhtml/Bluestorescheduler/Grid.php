@@ -24,7 +24,21 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 	 */
 	protected function _prepareCollection() {
 		$collection = Mage::getModel('cron/schedule')->getCollection();
-		$collection->addFieldToFilter('job_code',array('in'=>array("bluefish_connection_category","bluefish_connection_customer","bluefish_connection_customerexport","bluefish_connection_orderexport","bluefish_connection_orderimport","bluefish_connection_product","bluefish_connection_stock")));
+		$disabedCrons = split(",",Mage::getStoreConfig('system/cron/disabled_crons'));
+		
+		$jobcodeArray = array();
+		$jobcodeArray[] = "bluefish_connection_category";
+		$jobcodeArray[] = "bluefish_connection_customer";
+		$jobcodeArray[] = "bluefish_connection_customerexport";
+		$jobcodeArray[] = "bluefish_connection_orderexport";
+		$jobcodeArray[] = "bluefish_connection_orderimport";
+		$jobcodeArray[] = "bluefish_connection_product";
+		$jobcodeArray[] = "bluefish_connection_productexport";
+		$jobcodeArray[] = "bluefish_connection_stock";
+
+		$resultArray = array_diff($jobcodeArray, $disabedCrons);
+		
+		$collection->addFieldToFilter('job_code',array('in'=>$resultArray));
 		$this->setCollection($collection);
 		return parent::_prepareCollection();
 	}
@@ -105,9 +119,9 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 	
 	public function decorateMessages($value, $row) {
 		$return = '';
-		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$connection     = Mage::getSingleton('core/resource')->getConnection('core_write');
 		$prefix 	= Mage::getConfig()->getTablePrefix();		
-		$scheduleLog = $connection->query("SELECT error FROM ".$prefix."bluefish_cron_schedule_logs WHERE schedule_id = '".$row->getScheduleId()."'");
+		$scheduleLog    = $connection->query("SELECT error FROM ".$prefix."bluefish_cron_schedule_logs WHERE schedule_id = '".$row->getScheduleId()."'");
 		$scheduleResult = $scheduleLog->fetchAll(PDO::FETCH_ASSOC);
 		$errorLogsNum   = count($scheduleResult);	
 		

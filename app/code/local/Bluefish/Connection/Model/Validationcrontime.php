@@ -36,71 +36,130 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
      */
     protected function _beforeSave()
     {
-	    $value = $this->getValue();
-	    $connection = Mage::getSingleton('core/resource')->getConnection('core_write');    
-		$prefix 	= Mage::getConfig()->getTablePrefix();
+	$value      = $this->getValue();
+	$connection = Mage::getSingleton('core/resource')->getConnection('core_write');    
+	$prefix     = Mage::getConfig()->getTablePrefix();
 		
-		if (is_array($value)) {
-			unset($value['__empty']);
-		}
-		
-		$cronPath 	 = $this->getPath();
-		$loopCounter     = count($value);
-		
-		$resultPath      = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = '".$cronPath."'");
-		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
-		
-		
-		$doc     =  new DOMDocument();
-		$varpath =  dirname(dirname(dirname(__FILE__)));
-		$xmlFile = "$varpath/Connection/etc/config.xml";
-		$doc->load($xmlFile);
+	if (is_array($value)) {
+		unset($value['__empty']);
+	}
+	
+	$cronPath 	 = $this->getPath();
+	$loopCounter     = count($value);
+	
+	$resultPath      = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = '".$cronPath."'");
+	$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
+	
+	
+	$doc     =  new DOMDocument();
+	$varpath =  dirname(dirname(dirname(__FILE__)));
+	$xmlFile = "$varpath/Connection/etc/config.xml";
+	$doc->load($xmlFile);
 
-		switch ($cronPath)
+	switch ($cronPath)
+	{
+		case "mycustom_section/mycustom_category_group/mycustom_category_defaultminuteschedule":
+			 $markers = $doc->getElementsByTagName('bluefish_connection_category');
+			 break;
+		case "mycustom_section/mycustom_product_group/mycustom_product_commonschedule":
+			 $markers = $doc->getElementsByTagName('bluefish_connection_product');
+			 $markersProduct = $doc->getElementsByTagName('bluefish_connection_productexport');
+			 break;
+		case "mycustom_section/mycustom_stock_group/mycustom_stock_commonschedule":
+			 $markers = $doc->getElementsByTagName('bluefish_connection_stock');
+			 break;
+		case "mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule":
+			 $markers = $doc->getElementsByTagName('bluefish_connection_customer');
+			 $markersCustomer = $doc->getElementsByTagName('bluefish_connection_customerexport');
+			 break;
+		case "mycustom_section/mycustom_sales_group/mycustom_sales_commonschedule":
+			 $markers = $doc->getElementsByTagName('bluefish_connection_orderexport');
+			 $markersSales = $doc->getElementsByTagName('bluefish_connection_orderimport');
+			 break;
+	}
+	$countNum = 0;
+	$Minutecronconfig = "";
+	$Hourcronconfig   = "";
+	
+	foreach($value as $key => $valueconfig)
+	{
+		if($countNum == 0)
 		{
-			case "mycustom_section/mycustom_category_group/mycustom_category_defaultminuteschedule":
-				 $markers = $doc->getElementsByTagName('bluefish_connection_category');
-				 break;
-			case "mycustom_section/mycustom_product_group/mycustom_product_commonschedule":
-				 $markers = $doc->getElementsByTagName('bluefish_connection_product');
-				 break;
-			case "mycustom_section/mycustom_stock_group/mycustom_stock_commonschedule":
-				 $markers = $doc->getElementsByTagName('bluefish_connection_stock');
-				 break;
-			case "mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule":
-				 $markers = $doc->getElementsByTagName('bluefish_connection_customer');
-				 $markersCustomer = $doc->getElementsByTagName('bluefish_connection_customerexport');
-				 break;
-			case "mycustom_section/mycustom_sales_group/mycustom_sales_commonschedule":
-				 $markers = $doc->getElementsByTagName('bluefish_connection_orderexport');
-				 $markersSales = $doc->getElementsByTagName('bluefish_connection_orderimport');
-				 break;
+			$Hourcronconfig   =  $valueconfig['Hourcronconfig'];
+			$Minutecronconfig =  $valueconfig['Minutecronconfig'];
 		}
-		$countNum = 0;
-		$Minutecronconfig = "";
-		$Hourcronconfig   = "";
+		$countNum++;
+	}
+	if($Minutecronconfig == "" && $Hourcronconfig == "")
+	{
+		$cron_schedule_time = "0 0 * * *";			
+	}
+	else
+	{
+		$cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
+	}
 		
-		foreach($value as $key => $valueconfig)
+	
+	if(count($resultCronPath) == 0 || $resultCronPath[0]['loopCounter'] == 0)
+	{
+		if(isset($markersProduct))
 		{
-			if($countNum == 0)
+			foreach($markersProduct as $marker)
 			{
-				$Hourcronconfig   =  $valueconfig['Hourcronconfig'];
-				$Minutecronconfig =  $valueconfig['Minutecronconfig'];
+				$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
 			}
-			$countNum++;
-		}
-		if($Minutecronconfig == "" && $Hourcronconfig == "")
+		}			
+		if(isset($markersCustomer))
 		{
-			$cron_schedule_time = "0 0 * * *";			
+			foreach($markersCustomer as $marker)
+			{
+				$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+			}
+		}
+		if(isset($markersSales))
+		{
+			foreach($markersSales as $marker)
+			{
+				$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+			}
+		}
+		foreach($markers as $marker)
+		{
+			$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+		}			
+		$doc->saveXML();
+		$doc->save($xmlFile);	
+		$loopIteration = '1';
+		
+		if($resultCronPath[0]['loopCounter'] != '0')
+		{
+			$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule(id,cronPath,loopCounter,loopIteration)
+						VALUES('','".$cronPath."','".$loopCounter."','".$loopIteration."')");	
 		}
 		else
 		{
-			$cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
+			if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
+			{
+				$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$loopIteration."' where cronPath = '".$cronPath."'");					
+			}
+			$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopCounter= '".$loopCounter."' where cronPath = '".$cronPath."'");			
 		}
-			
-		
-		if(count($resultCronPath) == 0 || $resultCronPath[0]['loopCounter'] == '0')
+	}
+	else
+	{
+		if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
 		{
+			$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '1' where cronPath = '".$cronPath."'");					
+		}
+		else if($loopCounter == '1')
+		{
+			if(isset($markersProduct))
+			{
+				foreach($markersProduct as $marker)
+				{
+					$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
+				}
+			}				
 			if(isset($markersCustomer))
 			{
 				foreach($markersCustomer as $marker)
@@ -120,55 +179,11 @@ class Bluefish_Connection_Model_Validationcrontime extends Mage_Adminhtml_Model_
 				$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
 			}			
 			$doc->saveXML();
-			$doc->save($xmlFile);	
-			$loopIteration = '1';
-			
-			if($resultCronPath[0]['loopCounter'] != 0)
-			{
-				$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule(id,cronPath,loopCounter,loopIteration)
-							VALUES('','".$cronPath."','".$loopCounter."','".$loopIteration."')");	
-			}
-			else
-			{
-				if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
-				{
-					$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$loopIteration."' where cronPath = '".$cronPath."'");					
-				}
-				$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopCounter= '".$loopCounter."' where cronPath = '".$cronPath."'");			
-			}
+			$doc->save($xmlFile);			
 		}
-		else
-		{
-			if(($loopCounter == '0') || ($resultCronPath[0]['loopIteration'] > $loopCounter ))
-			{
-				$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '0' where cronPath = '".$cronPath."'");					
-			}
-			else if($loopCounter == '1')
-			{
-				if(isset($markersCustomer))
-				{
-					foreach($markersCustomer as $marker)
-					{
-						$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
-					}
-				}
-				if(isset($markersSales))
-				{
-					foreach($markersSales as $marker)
-					{
-						$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
-					}
-				}
-				foreach($markers as $marker)
-				{
-					$type = $marker->getElementsByTagName('cron_expr')->item(0)->nodeValue = $cron_schedule_time;
-				}			
-				$doc->saveXML();
-				$doc->save($xmlFile);			
-			}
-			
-			$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopCounter= '".$loopCounter."' where cronPath = '".$cronPath."'");	
-		}
+		
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopCounter= '".$loopCounter."' where cronPath = '".$cronPath."'");	
+	}
 
 	$this->setValue($value);
 	parent::_beforeSave();

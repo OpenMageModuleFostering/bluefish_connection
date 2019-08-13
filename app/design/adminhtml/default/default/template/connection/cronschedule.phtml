@@ -58,14 +58,9 @@ switch ($blockElement) {
 		$categoryDefaultTime = Array("*::45");			
         break;
 	}
-	
-$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
-$prefix 	= Mage::getConfig()->getTablePrefix(); 
 
-$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_auth_group/mycustom_login'");
-$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
-$numberRows 	 = count($resultCronPath);
-
+$credentialsLogin  = Mage::getStoreConfig('mycustom_section/mycustom_auth_group');
+$loginFlag         = $credentialsLogin['mycustom_login'];
 ?>
 
 <div class="grid" id="grid<?php echo $_htmlId ?>">
@@ -228,7 +223,7 @@ Event.observe('emptyAddBtn<?php echo $_htmlId ?>', 'click', function () {
     arrayRow<?php echo $_htmlId ?>.add('', '','');
 });
 
-<?php if (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_category_group")) { ?>
+<?php if (!$this->getArrayRows() && ($loginFlag == "") && ($blockName == "mycustom_category_group")) { ?>
 Event.observe(window, 'load', function () {
     $('grid<?php echo $_htmlId ?>').show();
     $('empty<?php echo $_htmlId ?>').hide();
@@ -241,21 +236,7 @@ Event.observe(window, 'load', function () {
 	<?php
 	} ?>
 });
-<?php } elseif (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_product_group")){?>
-Event.observe(window, 'load', function () {
-    $('grid<?php echo $_htmlId ?>').show();
-    $('empty<?php echo $_htmlId ?>').hide();
-
-	<?php
-	
-	for($i=0;$i<count($categoryDefaultTime);$i++)
-	{
-	?>
-		arrayRow<?php echo $_htmlId ?>.add('', '','<?php echo $categoryDefaultTime[$i] ?>');
-	<?php
-	} ?>
-});
-<?php } elseif (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_stock_group")){?>
+<?php } elseif (!$this->getArrayRows() && ($loginFlag == "") && ($blockName == "mycustom_product_group")){?>
 Event.observe(window, 'load', function () {
     $('grid<?php echo $_htmlId ?>').show();
     $('empty<?php echo $_htmlId ?>').hide();
@@ -269,7 +250,7 @@ Event.observe(window, 'load', function () {
 	<?php
 	} ?>
 });
-<?php } elseif (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_customer_group")){?>
+<?php } elseif (!$this->getArrayRows() && ($loginFlag == "") && ($blockName == "mycustom_stock_group")){?>
 Event.observe(window, 'load', function () {
     $('grid<?php echo $_htmlId ?>').show();
     $('empty<?php echo $_htmlId ?>').hide();
@@ -283,7 +264,21 @@ Event.observe(window, 'load', function () {
 	<?php
 	} ?>
 });
-<?php } elseif (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_sales_group")){?>
+<?php } elseif (!$this->getArrayRows() && ($loginFlag == "") && ($blockName == "mycustom_customer_group")){?>
+Event.observe(window, 'load', function () {
+    $('grid<?php echo $_htmlId ?>').show();
+    $('empty<?php echo $_htmlId ?>').hide();
+
+	<?php
+	
+	for($i=0;$i<count($categoryDefaultTime);$i++)
+	{
+	?>
+		arrayRow<?php echo $_htmlId ?>.add('', '','<?php echo $categoryDefaultTime[$i] ?>');
+	<?php
+	} ?>
+});
+<?php } elseif (!$this->getArrayRows() && ($loginFlag == "") && ($blockName == "mycustom_sales_group")){?>
 Event.observe(window, 'load', function () {
     $('grid<?php echo $_htmlId ?>').show();
     $('empty<?php echo $_htmlId ?>').hide();

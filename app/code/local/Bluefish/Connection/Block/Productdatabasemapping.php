@@ -38,7 +38,7 @@ class Bluefish_Connection_Block_Productdatabasemapping extends Mage_Adminhtml_Bl
     public function __construct()
     {
         $this->addColumn('Dbproductmapping', array(
-            'label' => Mage::helper('adminhtml')->__('Choose One Option'),
+            'label' => Mage::helper('adminhtml')->__(' '),
             'size'  => 28,
         ));
  
@@ -48,22 +48,18 @@ class Bluefish_Connection_Block_Productdatabasemapping extends Mage_Adminhtml_Bl
  
     protected function _renderCellTemplate($columnName)
     {
-		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
-		$prefix 	= Mage::getConfig()->getTablePrefix();
+        $credentialsProduct   = Mage::getStoreConfig('mycustom_section/mycustom_product_group');
+	$productmappingFlag   = $credentialsProduct['mycustom_product_mapping_direct'];
+	$unserielVal 	       = unserialize($productmappingFlag);
+	$numberRows            = count($unserielVal);			
 		
-		$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_product_group/mycustom_product_mapping_direct'");
-		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
-		$numberRows 	 = count($resultCronPath);
-		
-		if($numberRows > 0)
-		{
-			$unserielVal = unserialize($resultCronPath[0]['value']);
-			
-			$checkbox_Direct  = ($unserielVal['#{_id}']['Dbproductmapping'] == 'DirectProduct')?'checked':'unchecked';
-			$checkbox_Mapping = ($unserielVal['#{_id}']['Dbproductmapping'] == 'MappingProduct')?'checked':'unchecked';
-		}
-		else
-			$checkbox_Direct = 'checked';
+	if($numberRows > 0)
+	{
+		$checkbox_Direct  = ($unserielVal['#{_id}']['Dbproductmapping'] == 'DirectProduct')?'checked':'unchecked';
+		$checkbox_Mapping = ($unserielVal['#{_id}']['Dbproductmapping'] == 'MappingProduct')?'checked':'unchecked';
+	}
+	else
+		$checkbox_Direct = 'checked';
 
 		
         if (empty($this->_columns[$columnName])) {
@@ -72,7 +68,7 @@ class Bluefish_Connection_Block_Productdatabasemapping extends Mage_Adminhtml_Bl
         $column     = $this->_columns[$columnName];
         $inputName  = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
  
-         $rendered = 'Direct Mapping <input type="radio" name="'.$inputName.'" value="DirectProduct" onclick="getdetails_related_product(\'DirectProduct\')" '.$checkbox_Direct.' id="DirectProduct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mapping Table <input type="radio" name="'.$inputName.'" value="MappingProduct" onclick="getdetails_related_product(\'MappingProduct\')" '.$checkbox_Mapping.' id="MappingProduct" >';
-         return $rendered;
+        $rendered = 'Direct Mapping <input type="radio" name="'.$inputName.'" value="DirectProduct" onclick="getdetails_related_product(\'DirectProduct\')" '.$checkbox_Direct.' id="DirectProduct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mapping Table <input type="radio" name="'.$inputName.'" value="MappingProduct" onclick="getdetails_related_product(\'MappingProduct\')" '.$checkbox_Mapping.' id="MappingProduct" >';
+        return $rendered;
     }
 }

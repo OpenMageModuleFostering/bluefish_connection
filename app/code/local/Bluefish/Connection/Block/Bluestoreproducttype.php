@@ -31,43 +31,58 @@
  * @package    Mage_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Bluefish_Connection_Block_Databasemapping extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
+class Bluefish_Connection_Block_Bluestoreproducttype extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
 {
     protected $magentoAttributes;
  
     public function __construct()
     {
-        $this->addColumn('Dbmapping', array(
-            'label' => Mage::helper('adminhtml')->__(' '),
+        $this->addColumn('magentoproducttype', array(
+            'label' => Mage::helper('adminhtml')->__('Magento Product Type'),
             'size'  => 28,
         ));
+        $this->addColumn('bluestoreproducttype', array(
+            'label' => Mage::helper('adminhtml')->__('Bluestore Product Type'),
+            'size'  => 28
+        ));
+        $this->_addAfter = false;
+        $this->_addButtonLabel = Mage::helper('adminhtml')->__('Add New Product Type');
  
         parent::__construct();
-        $this->setTemplate('connection/custom_radioinput.phtml');
+        $this->setTemplate('connection/array_dropdown.phtml');
     }
  
     protected function _renderCellTemplate($columnName)
     {
-        $credentialsCategory   = Mage::getStoreConfig('mycustom_section/mycustom_category_group');
-	$categorymappingFlag   = $credentialsCategory['mycustom_category_mapping_direct'];
-	$unserielVal 	       = unserialize($categorymappingFlag);
-	$numberRows            = count($unserielVal);			
-		
-	if($numberRows > 0)
-	{
-		$checkbox_Direct  = ($unserielVal['#{_id}']['Dbmapping'] == 'Direct')?'checked':'unchecked';
-		$checkbox_Mapping = ($unserielVal['#{_id}']['Dbmapping'] == 'Mapping')?'checked':'unchecked';
-	}
-	else
-		$checkbox_Direct = 'checked';
-
         if (empty($this->_columns[$columnName])) {
             throw new Exception('Wrong column name specified.');
         }
         $column     = $this->_columns[$columnName];
         $inputName  = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
  
-         $rendered = 'Direct Mapping <input type="radio" name="'.$inputName.'" value="Direct" onclick="getdetails_related(\'Direct\')" '.$checkbox_Direct.' id="Direct">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mapping Table <input type="radio" name="'.$inputName.'" value="Mapping" onclick="getdetails_related(\'Mapping\')" '.$checkbox_Mapping.' id="Mapping" >';
+        if($columnName == 'magentoproducttype')
+        {
+            $productType = array("simple"       => "Simple Product",
+                                 "grouped"      => "Grouped Product",
+                                 "configurable" => "Configurable Product",
+                                 "virtual"      => "Virtual Product",
+                                 "bundle"       => "Bundle Product",
+                                 "downloadable" => "Downloadable Product"                         
+                                 );
+	    
+	    $rendered = '<select name="'.$inputName.'">';
+	    
+	    foreach($productType as $key => $value)
+	    {
+		    $rendered .= '<option value="'.$key.'">'.$value.'</option>';
+	    }
+	    
+	    $rendered .= '</select>';
+        }
+        else
+        {
+            $rendered = '<input type="text" name="'.$inputName.'" value="">';
+        }
          return $rendered;
     }
 }

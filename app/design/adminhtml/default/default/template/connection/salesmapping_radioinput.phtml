@@ -33,8 +33,6 @@ if (!$this->_addAfter) {
     $_colspan -= 1;
 }
 $_colspan = $_colspan > 1 ? 'colspan="' . $_colspan . '"' : '';
-$url = $this->getUrl('bluefish/adminhtml_productdata');
-
 ?>
 
 <div class="grid" id="grid<?php echo $_htmlId ?>">
@@ -54,28 +52,9 @@ $url = $this->getUrl('bluefish/adminhtml_productdata');
 				</td>
 	<?php endforeach;?>
 </tr>	
-
-
-<tr id="manageproductcat">		
-	<td align="center"><button style="" onclick="popWin('<?=$url?>','compare','top:0,left:0,width=820,height=600,resizable=yes,scrollbars=yes')" class="scalable scalable" type="button" title="Click Here!"><span>Maintain Product Mapping Table</span></button></td>
-</tr>	
-
         </tbody>
 		
     </table>
 </div>
-<style>
-.hidden { display: none; }
-.visible {}
-</style>
 
-<script type="text/javascript">
-Event.observe(window, 'load', function() { if($('DirectProduct').checked == true) $('manageproductcat').hide(); });
-function getdetails_related_product(val){
-	if(val == 'MappingProduct')
-		$('manageproductcat').appear(1000);
-	else
-		$('manageproductcat').fade(1000);
-}
-</script>
 

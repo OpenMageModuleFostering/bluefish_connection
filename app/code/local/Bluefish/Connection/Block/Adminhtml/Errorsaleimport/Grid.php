@@ -2,7 +2,6 @@
 
 class Bluefish_Connection_Block_Adminhtml_Errorsaleimport_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-
 		public function __construct()
 		{
 				parent::__construct();
@@ -11,7 +10,7 @@ class Bluefish_Connection_Block_Adminhtml_Errorsaleimport_Grid extends Mage_Admi
 				$this->setDefaultDir("DESC");
 				$this->setSaveParametersInSession(true);
 		}
-
+		
 		protected function _prepareCollection()
 		{
 				$collection = Mage::getModel("connection/errorsaleimport")->getCollection();
@@ -24,10 +23,10 @@ class Bluefish_Connection_Block_Adminhtml_Errorsaleimport_Grid extends Mage_Admi
 				"header" => Mage::helper("connection")->__("ID"),
 				"align" =>"right",
 				"width" => "50px",
-			        "type" => "number",
+				"type" => "number",
 				"index" => "id",
 				));
-                
+		
 				$this->addColumn("sale_code", array(
 				"header" => Mage::helper("connection")->__("Transaction Code"),
 				"index" => "sale_code",
@@ -48,16 +47,13 @@ class Bluefish_Connection_Block_Adminhtml_Errorsaleimport_Grid extends Mage_Admi
 				));
 			$this->addExportType('*/*/exportCsv', Mage::helper('sales')->__('CSV')); 
 			$this->addExportType('*/*/exportExcel', Mage::helper('sales')->__('Excel'));
-
+		
 				return parent::_prepareColumns();
 		}
-
+		
 		public function getRowUrl($row)
 		{
 			   return '#';
 		}
-
-
-		
 
 }

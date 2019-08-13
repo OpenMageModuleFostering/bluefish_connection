@@ -22,19 +22,23 @@ function checkForm(form)
     <form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/post')?>">
 		
         <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
-		<input name="button_name" type="hidden" value="" />
+        <input name="button_name" type="hidden" value="" />
         <h4 style="color: white; margin-left: 20px; padding: 8px 0px 0px;"><?php echo $this->__('Export')?></h4>
         <fieldset id="my-fieldset" style="background:white;">
             <table cellspacing="0" class="form-list">
- 				<tr>
+ 		<tr>
                     <td class="label"><?php echo $this->__('Customers')?> </td>
                     <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="6" type="button"><span>Export</span></button></td>
                 </tr>
-				<tr>
+ 		<tr>
+                    <td class="label"><?php echo $this->__('Products')?> </td>
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="9" type="button"><span>Export</span></button></td>
+                </tr>		
+		<tr>
                     <td class="label"><?php echo $this->__('Completed Sales')?> </td>
                     <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="5" type="button"><span>Export</span></button></td>
                 </tr>
-		    </table>
+             </table>
 			<i>Bluestore Data Exchange is configured in System - Configuration under Services - Bluestore Live.</i>
         </fieldset>
     </form>
