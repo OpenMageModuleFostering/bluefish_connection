@@ -4,7 +4,7 @@
     <Bluefish_Connection>
       <active>true</active>
       <codePool>local</codePool>
-      <version>1.1.4</version>
+      <version>1.1.5</version>
     </Bluefish_Connection>
   </modules>
 </config>

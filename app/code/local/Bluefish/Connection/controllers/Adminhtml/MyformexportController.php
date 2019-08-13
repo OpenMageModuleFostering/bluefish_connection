@@ -93,9 +93,22 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 				{
 					if($row->batchSuccess == "true")
 					{
-						$code 			= strval($row->transaction['docNo']);
-						$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
-												 VALUES('','".$code."','".now()."')");
+						$code 	= strval($row->transaction['docNo']);
+
+						$resultClosed = $connection->query("SELECT id FROM ".$prefix."bluefish_sale_post WHERE order_id = '".$code."'");
+			
+						$resultSetClosed = $resultClosed->fetchAll(PDO::FETCH_ASSOC);
+						$numberRowsClosed = count($resultSetClosed);						
+						
+						if($numberRowsClosed == 0)
+						{
+							$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
+													 VALUES('','".$code."','".now()."')");
+						}
+						else{
+							$connection->query("UPDATE ".$prefix."bluefish_sale_post SET  status= 'closed' WHERE order_id = '".$code."'");
+						}
+
 					    $countSuccess++;
 					}	
 				}
@@ -658,6 +671,8 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 			case 7:	 #### This case handles the category data export in csv
 					try
 					{
+						ini_set("memory_limit","10000M");
+						set_time_limit(0);						
 						$appBaseDir = Mage::getBaseDir();
 						$mageFilename = $appBaseDir.'/app/Mage.php';
 						require_once $mageFilename;
@@ -693,7 +708,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 									}
 									else
 									{
-										$string = "INSTANCE,,true,".trim($id).",".trim($category->load($id)->getName()).",en\n";
+										$string = "INSTANCE,,true,".trim($id).",".trim(substr($category->load($id)->getName(),0,30)).",en\n";
 										fputs($fp,"$string",100000);
 									}
 								    $rowid++;
@@ -718,7 +733,104 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
 					}
 					break;
-				
+			case 10:	 #### This case handles the product data export in csv
+					try
+					{
+						ini_set("memory_limit","10000M");
+						set_time_limit(0);
+						$appBaseDir = Mage::getBaseDir();
+						$mageFilename = $appBaseDir.'/app/Mage.php';
+						require_once $mageFilename;
+						
+						$credentialsSales  = Mage::getStoreConfig('mycustom_section/mycustom_sales_import_group');
+						$salesMappingFlag  = $credentialsSales['mycustom_sales_mapping_method'];
+						$unserielVal 	   = unserialize($salesMappingFlag);
+						
+						$credentialsTaxclass  = Mage::getStoreConfig('mycustom_section/mycustom_taxclass_group');
+						$taxClassSerialArr    = $credentialsTaxclass['mycustom_taxclass_magento'];		
+						$unserielTaxClass     = unserialize($taxClassSerialArr);
+
+						$credentialsExport    = Mage::getStoreConfig('mycustom_section/mycustom_product_export_group');
+						$unitOfMeasureCode    = $credentialsExport['mycustom_unitofmeasure'];						
+						
+						$fileName   = "product_dump_".date('Y-m-d').".csv";
+						$fileHandle = fopen($fileName, "w");
+
+						$header = "#,imageName,saleable,productCategory,code,productType,taxClass,active,unitOfMeasure,discountAllowed,returnable,barcode,price,currency,startDate,description,language,age,ageRestricted,soldByWeight,requestPrice";
+						fputs($fileHandle,"$header\n",10000);
+						
+						$string = "PRODUCT,1.0\n";
+						fputs($fileHandle,"$string",100000);
+
+						$productObj = Mage::getModel('catalog/product')->getCollection()->addAttributeToSelect('*'); // you can add * or field name here eg. ('sku','product_name','description')
+						
+						foreach ($productObj as $productRow) {
+							
+							foreach($unserielTaxClass as $key => $valueTax)
+							{
+								if($productRow->getTaxClassId() == $valueTax['magentotaxclass'])
+								{
+									$bluestoreTaxclassCode = $valueTax['bluestoretaxclass'];
+								}								
+							}							
+							
+							$getCategoryIdsArr = $productRow->getCategoryIds();
+							$productCategory   = $getCategoryIdsArr['0'];
+	
+							if($unserielVal['#{_id}']['Salemapping'] == 'Productcode')
+							{						
+							    $productCode = $productRow->getSku();
+							}
+							else{
+							    $productCode = $productRow->getId();
+							}							
+							
+							$ProductStatus = ($productRow->getStatus() == "1")?'true':'false';
+							
+							$createdDate   = date("d.m.Y",strtotime($productRow->getCreatedAt()));
+							
+						        $dataCollection = array(
+									"INSTANCE",
+									'',
+									"true",
+									$productCategory,
+									$productCode,
+									"Standard",
+									$bluestoreTaxclassCode,
+									$ProductStatus,
+									$unitOfMeasureCode,
+									"true",
+									"true",
+									'',
+									$productRow->getPrice(),
+									$currencyCode,
+									$createdDate,
+									substr($productRow->getName(),0,30),
+									"en",
+									'',
+									"false",
+									"false",
+									"false"			
+								);
+						        fputcsv($fileHandle, $dataCollection);
+						}
+						
+						fclose($fileHandle);
+						ob_clean();
+						header("Content-type: application/csv");
+						header("Content-Disposition: attachment; filename=$fileName");
+						header("Pragma: no-cache");
+						header("Expires: 0");
+						$content = file_get_contents("$appBaseDir/$fileName");
+						echo $content;
+						die;
+					}
+					catch (Exception $e)
+					{
+						Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+					}
+					break;
+			
 		}
 		
     }

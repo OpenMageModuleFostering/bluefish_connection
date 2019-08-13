@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Bluefish_Connection>
-            <version>1.1.4</version>
+            <version>1.1.5</version>
 	    <depends>
 		<Mage_Shipping/>
 	    </depends>
@@ -188,15 +188,15 @@
 	<crontab>
 	<jobs>
             <bluefish_connection_category>
-                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <schedule><cron_expr>22 9 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::categoryImport</model></run>
             </bluefish_connection_category>
 	    <bluefish_connection_product>
-                <schedule><cron_expr>55 9 * * *</cron_expr></schedule>
+                <schedule><cron_expr>15 */4 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::productImport</model></run>
             </bluefish_connection_product>
 	    <bluefish_connection_productexport>
-                <schedule><cron_expr>55 9 * * *</cron_expr></schedule>
+                <schedule><cron_expr>15 */4 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::productEmport</model></run>
             </bluefish_connection_productexport>	    
 	    <bluefish_connection_stock>
@@ -212,11 +212,11 @@
                 <run><model>connection/cronobserver::customerExport</model></run>
             </bluefish_connection_customerexport>
   	    <bluefish_connection_orderimport>
-                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <schedule><cron_expr>25 15 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::salesImport</model></run>
             </bluefish_connection_orderimport>			
   	    <bluefish_connection_orderexport>
-                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <schedule><cron_expr>25 15 * * *</cron_expr></schedule>
                 <run><model>connection/cronobserver::salesExport</model></run>
             </bluefish_connection_orderexport>
 	</jobs>

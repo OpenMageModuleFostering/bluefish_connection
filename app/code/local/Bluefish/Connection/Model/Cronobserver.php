@@ -103,9 +103,13 @@ class Bluefish_Connection_Model_Cronobserver extends Bluefish_Connection_Adminht
 		}		
 		$this->postAction('5');
 	}
-	public function categoryCSVExport() ### This Function is used for customer data Export
+	public function categoryCSVExport() ### This Function is used for category data Export in csv
 	{
 		$this->postAction('7');
 	}
+	public function productCSVExport() ### This Function is used for product data Export in csv
+	{
+		$this->postAction('10');
+	}	
 }
 ?>

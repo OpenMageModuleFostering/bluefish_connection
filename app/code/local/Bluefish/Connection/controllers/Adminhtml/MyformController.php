@@ -79,6 +79,12 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 	{
 		$appBaseDir = Mage::getBaseDir();
 		$xmlFiles = $appBaseDir."/products_bluestore.xml";
+		
+		if(file_exists($xmlFiles))
+		{
+		       unlink($xmlFiles);
+		}
+		
 		$fh = fopen($xmlFiles, 'w+');
 		fwrite($fh, $response);
 		fclose($fh);
@@ -346,16 +352,28 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				$countSuccess = 0;
 				foreach($ResposeData as $row)
 				{
+					$code 	= strval($row->transaction['docNo']);
+					
 					if($row->batchSuccess == "true")
 					{
-						$code 			= strval($row->transaction['docNo']);
-						$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
-												 VALUES('','".$code."','".now()."')");
+						$resultClosed = $connection->query("SELECT id FROM ".$prefix."bluefish_sale_post WHERE order_id = '".$code."'");
+			
+						$resultSetClosed = $resultClosed->fetchAll(PDO::FETCH_ASSOC);
+						$numberRowsClosed = count($resultSetClosed);						
+						
+						if($numberRowsClosed == 0)
+						{
+							$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
+													 VALUES('','".$code."','".now()."')");
+						}
+						else{
+							$connection->query("UPDATE ".$prefix."bluefish_sale_post SET  status= 'closed' WHERE order_id = '".$code."'");
+						}
 					    $countSuccess++;
 					}
 					else
 					{
-						$ErrorMsg  .= $row->transaction->message.":";
+						$ErrorMsg  .= "Error in Order# ".$code." ".$row->transaction->message.":";
 					}
 				}
 				if($ErrorMsg != "" || $xmlData->message !="")
@@ -810,17 +828,11 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 						{
 							$categoryCodeValue = $catcodeVal['code'];
 							$responseValue     = "";
+							$response          = "";
 							
 							$array=array();
 							
-							if($mainVersionVal == '0')
-							{
-								$array=array('where'=>rawurlencode('categoryCode = '.$categoryCodeValue.''));
-							}
-							else
-							{
-								$array=array('where'=>rawurlencode('version > '.$mainVersionVal.''));
-							}
+							$array=array('where'=>rawurlencode('categoryCode = '.$categoryCodeValue.''));
 							
 							$auth = build_auth_array($baseurl, $credentials['mycustom_code'],$permFile,$array);
 							
@@ -839,6 +851,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 							curl_setopt($tuCurl, CURLOPT_HTTPHEADER, array("Accept: application/xml"));
 							$response = curl_exec($tuCurl);
 							$response1 = curl_getinfo( $tuCurl );
+							$xmlObj    = "";
 							
 							if($response != "")
 							{

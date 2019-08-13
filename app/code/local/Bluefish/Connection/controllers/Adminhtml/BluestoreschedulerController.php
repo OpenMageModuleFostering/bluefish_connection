@@ -2,7 +2,7 @@
 /**
  * Monitor Schedule Task controller
  *
- * @author Yuvarj Singh
+ * @author Bluefishretail
  */
 class Bluefish_Connection_Adminhtml_BluestoreschedulerController extends Mage_Adminhtml_Controller_Action {
 

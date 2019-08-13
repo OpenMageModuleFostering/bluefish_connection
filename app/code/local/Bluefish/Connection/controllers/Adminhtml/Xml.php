@@ -370,15 +370,6 @@ function insert_update_database2()
 	$xmlObj  = new Varien_Simplexml_Config($xmlPath);
 	$xmlData = $xmlObj->getNode();
 	
-	/*$mageFilename = $appBaseDir.'/app/Mage.php';
-	require_once $mageFilename;
-	Mage::setIsDeveloperMode(true);
-
-	umask(0);
-	Mage::app('admin');
-	Mage::register('isSecureArea', 1);
-	Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);*/
-	
 	Mage::log('Stock Import started ......', null, './Bluestore_stock.log.text');
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 	
@@ -498,7 +489,17 @@ function insert_update_database2()
 			$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
 									 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
 		}
-	}		
+	}
+	
+	if(php_sapi_name() == 'cli' || empty($_SERVER['REMOTE_ADDR'])) {
+		/**** For reindex all the data ****/
+		$indexCollection = Mage::getModel('index/process')->getCollection();
+		foreach ($indexCollection as $index) {
+		    /* @var $index Mage_Index_Model_Process */
+		    $index->reindexAll();
+		}	   
+	}
+	
 	$flag = "success";
 	return $flag;
 }
@@ -584,10 +585,11 @@ function insert_update_database1()
 								$resultSetProduct  = $resultProduct->fetchAll(PDO::FETCH_ASSOC);
 								$numberProductRows = count($resultSetProduct);
 								
-								if($resultSetProduct[0]['product_id'] != "")
+								if($resultSetProduct[0]['product_id'] != "" && $numberProductRows > 0 )
 								{
 									try
 									{
+										$resultProductInfo = "";
 										$resultProductInfo = $soap->call($sessionId, 'catalog_product.info', $resultSetProduct[0]['product_id']);
 										
 										if (!in_array($resultSet[0]['category_id'],$resultProductInfo['categories']))
@@ -704,17 +706,23 @@ function insert_update_database1()
 					$resultDirect = $connection->query("select code,category_id from ".$prefix."bluefish_category WHERE code = '".$categoryCode."'");
 					$resultSetDirect  = $resultDirect->fetchAll(PDO::FETCH_ASSOC);
 					$numberRowsDirect = count($resultSetDirect);
+					$DirectcategoryCode = "";
 	
 					$DirectcategoryCode = ($numberRowsDirect > 0)?$resultSetDirect[0][category_id]:$categoryCode;
 					
 					try
 					{
 						$productMainID = Mage::getModel('catalog/product')->getIdBySku("$codeSKU");
-				
-						$resultProductInfoDirect = $soap->call($sessionId, 'catalog_product.info', $productMainID);
-						if(!in_array($DirectcategoryCode,$resultProductInfoDirect['categories']))
+						
+						if($productMainID != "")
 						{
-							array_push($resultProductInfoDirect['categories'],$DirectcategoryCode);
+							$resultProductInfoDirect = "";
+					
+							$resultProductInfoDirect = $soap->call($sessionId, 'catalog_product.info', $productMainID);
+							if(!in_array($DirectcategoryCode,$resultProductInfoDirect['categories']))
+							{
+								array_push($resultProductInfoDirect['categories'],$DirectcategoryCode);
+							}
 						}
 					}
 					catch(Exception $e)
@@ -723,8 +731,9 @@ function insert_update_database1()
 						$returnmessage = $flag;
 					}			
 					try
-					{
+					{ 
 						$ProductStatus = ($status == "true")?'1':'2';
+
 						$resultProductUpdate = $soap->call($sessionId, 'catalog_product.update', array($productMainID, array(
 							'categories' => $resultProductInfoDirect['categories'],
 							'websites' => array(1),
@@ -771,11 +780,6 @@ function insert_update_database1()
 					}					
 				}
 			}
-			/*else
-			{
-				$flag = "noProduct";
-				return $flag;
-			}*/
 		}
 		if($ErrorMsg != "")
 		{
@@ -801,6 +805,16 @@ function insert_update_database1()
 	{
 		$returnmessage = "noProduct";
 	}
+	
+	if(php_sapi_name() == 'cli' || empty($_SERVER['REMOTE_ADDR'])) {
+		/**** For reindex all the data ****/
+		$indexCollection = Mage::getModel('index/process')->getCollection();
+		foreach ($indexCollection as $index) {
+		    /* @var $index Mage_Index_Model_Process */
+		    $index->reindexAll();
+		}	   
+	}
+	
 	return $returnmessage;
 }
 
@@ -1719,38 +1733,57 @@ function importBluestoreSales($transactionNumber)
 											$item_id = array();
 											
 											foreach($item_array as $item_key=>$item_val){
-												$item_id[] = $item_val[item_id];
+												$item_id[$item_val['product_id']] = $item_val['item_id'];
 											}
 											
+											$bluestoreProductArr = array();	
 											for($k=0;$k<count($xmlData->sale[$i]->items->item);$k++){
 												
-												$finalAmount		= 	"";
-												$finalAmountExclTax	= 	"";
-												$quantity		=	"";
-												$quantity		=	(int)$xmlData->sale[$i]->items->item[$k]->quantity;
-												$finalAmountExclTax	=	(float)$xmlData->sale[$i]->items->item[$k]->finalAmountExclTax;
+												$pCode  = (int)$xmlData->sale[$i]->items->item[$k]->productCode; 
+												if($unserielVal['#{_id}']['Salemapping'] == 'Productcode')
+												{
+													$magento_ProductId = Mage::getModel("catalog/product")->getIdBySku($pCode);
+												}
+												else{
+													$magento_ProductId = $pCode;
+												}																				
 												
-											
-												$finalAmount = (float)($finalAmountExclTax / $quantity);
+												$pQty   = (int)$xmlData->sale[$i]->items->item[$k]->quantity;
+												$pAmt   = (float)$xmlData->sale[$i]->items->item[$k]->finalAmountExclTax;
 												
-												if ($quantity < 1) {
-													$finalAmount = -$finalAmount;
+												if(is_array($bluestoreProductArr[$magento_ProductId]))
+												{
+													$bluestoreProductArr[$magento_ProductId]['qty'] +=   $pQty;
+													$bluestoreProductArr[$magento_ProductId]['amt'] +=   $pAmt;													
+												} else {
+													$bluestoreProductArr[$magento_ProductId]['qty'] =   $pQty;
+													$bluestoreProductArr[$magento_ProductId]['amt'] =   $pAmt;		
 												}
 												
+											}
+
+											foreach($bluestoreProductArr as $KeyArr => $keyVal){
 												
+												$finalAmount = 	"";
+												$finalAmount = (float)($keyVal['amt'] / $keyVal['qty']);
+												
+												if ($keyVal['qty'] < 1) {
+													$finalAmount = -$finalAmount;
+												}
+
 												$connection->query("UPDATE ".$prefix."sales_flat_quote_item SET
 														   `custom_price` = '$finalAmount',
 														   `original_custom_price` = '$finalAmount',						   
-														   `qty` = '$quantity'
-														   WHERE `sales_flat_quote_item`.`item_id` =".$item_id[$k]);
+														   `qty` = '".$keyVal['qty']."'
+														   WHERE `sales_flat_quote_item`.`item_id` =".$item_id[$KeyArr]);
 											}		
-											
+
 										}
 										catch(Exception $e){
 											$error .= $e->getMessage()."<br>";	
 										}
-										
-										if($error == "") ### checking when there is in cart info API
+
+										if($error == "") ### checking when there is no error in cart info API
 										{										
 											$licenseForOrderCreation = null;
 									
@@ -1770,56 +1803,73 @@ function importBluestoreSales($transactionNumber)
 															    ->addObject($invoice->getOrder());
 												
 												$transaction_save->save();
-												
-												//now create shipment
-												//after creation of shipment, the order auto gets status COMPLETE
-												$shipment = $order->prepareShipment();
-												if( $shipment ) {
-												     $shipment->register();
-												     $order->setIsInProcess(true);
-												
-												     $transaction_save = Mage::getModel('core/resource_transaction')
-																->addObject($shipment)
-																->addObject($shipment->getOrder())
-																->save();
-												}
-												
-												###### For credit memo only
-												if($orderIncrementId != "" && count($arrQtyRefund) > 0)
-												{
-													foreach($arrQtyRefund as $keyProductID => $valProductQTY)
-													{
-														$newQty     = "";
-														$productId  = "";
-														$availableStockQty = "";
-														
-														$_product   = Mage::getModel('catalog/product')->load($keyProductID);
-
-														$stockAvail = Mage::getModel('cataloginventory/stock_item')->loadByProduct($_product);
-														$availableStockQty =  $stockAvail->getQty();
-														
-														$newQty         = $valProductQTY * (-2);
-														$newQty         = $newQty  + $availableStockQty;
-														$productId      = $keyProductID;
-													 
-														$sql            = "UPDATE ".$prefix."cataloginventory_stock_item csi,
-																		   " .$prefix."cataloginventory_stock_status css
-																		   SET
-																		   csi.qty = ?,
-																		   csi.is_in_stock = ?,
-																		   css.qty = ?,
-																		   css.stock_status = ?
-																		   WHERE
-																		   csi.product_id = ?
-																		   AND csi.product_id = css.product_id";
-														$isInStock      = $newQty > 0 ? 1 : 0;
-														$stockStatus    = $newQty > 0 ? 1 : 0;
-														$connection->query($sql, array($newQty, $isInStock, $newQty, $stockStatus, $productId));
-													}
-												}
 											}
 											catch(Exception $e){
 												$error .= $e->getMessage()."<br>";	
+											}
+											
+											if($error == "") ### checking when there is no error in save transaction
+											{
+												try{
+													
+													//now create shipment
+													//after creation of shipment, the order auto gets status COMPLETE
+													$shipment = $order->prepareShipment();
+													if( $shipment ) {
+													     $shipment->register();
+													     $order->setIsInProcess(true);
+													
+													     $transaction_save = Mage::getModel('core/resource_transaction')
+																	->addObject($shipment)
+																	->addObject($shipment->getOrder())
+																	->save();
+													}
+													
+												}
+												catch(Exception $e){
+													$error .= $e->getMessage()."<br>";	
+												}
+												if($error == "") ### checking when there is no error in set shipment status
+												{												
+													try{
+														###### For credit memo only
+														if($orderIncrementId != "" && count($arrQtyRefund) > 0)
+														{
+															foreach($arrQtyRefund as $keyProductID => $valProductQTY)
+															{
+																$newQty     = "";
+																$productId  = "";
+																$availableStockQty = "";
+																
+																$_product   = Mage::getModel('catalog/product')->load($keyProductID);
+		
+																$stockAvail = Mage::getModel('cataloginventory/stock_item')->loadByProduct($_product);
+																$availableStockQty =  $stockAvail->getQty();
+																
+																$newQty         = $valProductQTY * (-2);
+																$newQty         = $newQty  + $availableStockQty;
+																$productId      = $keyProductID;
+															 
+																$sql            = "UPDATE ".$prefix."cataloginventory_stock_item csi,
+																				   " .$prefix."cataloginventory_stock_status css
+																				   SET
+																				   csi.qty = ?,
+																				   csi.is_in_stock = ?,
+																				   css.qty = ?,
+																				   css.stock_status = ?
+																				   WHERE
+																				   csi.product_id = ?
+																				   AND csi.product_id = css.product_id";
+																$isInStock      = $newQty > 0 ? 1 : 0;
+																$stockStatus    = $newQty > 0 ? 1 : 0;
+																$connection->query($sql, array($newQty, $isInStock, $newQty, $stockStatus, $productId));
+															}
+														}
+													}
+													catch(Exception $e){
+														$error .= $e->getMessage()."<br>";	
+													}
+												}
 											}
 										}
 									}
@@ -1849,7 +1899,11 @@ function importBluestoreSales($transactionNumber)
 	if((count($xmlData) > 0) && ($transactionNumber == ""))
 	{
 		$updateLastDateVal = max($updateLastDateArr);
-		Mage::getModel('core/config')->saveConfig('mycustom_section/mycustom_sales_import_group/mycustom_bluestore_enddatetime', $updateLastDateVal);		
+		
+		if(($updateLastDateVal != "") && (count($updateLastDateArr) > 0))
+		{		
+			Mage::getModel('core/config')->saveConfig('mycustom_section/mycustom_sales_import_group/mycustom_bluestore_enddatetime', $updateLastDateVal);
+		}
 	}
 	
 	if($errorNum > 0){
@@ -1901,6 +1955,7 @@ function ExportOrderData()
 		$commonschedule_Sale  = $credentials['mycustom_sales_commonschedule'];
 		$unserielSaleVal      = unserialize($commonschedule_Sale);
 		$lastUpdatedDate      = $credentials['mycustom_sales_last_export'];
+		$bluestoreUserName    = $credentials['mycustom_sale_username'];
 		
 		$SaleCount = 0;
 		
@@ -1953,13 +2008,22 @@ function ExportOrderData()
 			if($lastUpdatedDate !="")
 			{
                                 $thesearch =array(array('updated_at'=>array('gt'=>$lastUpdatedDate), 'status'=>array('eq'=>"complete")));				
-				$resultOrderList = $soap->call($sessionId, 'order.list',$thesearch);
+				$resultOrderListCompleted = $soap->call($sessionId, 'order.list',$thesearch);
 			}
 			else
 			{
                                 $thesearch =array(array('status'=>array('eq'=>"complete")));				
-				$resultOrderList = $soap->call($sessionId, 'order.list',$thesearch);			
+				$resultOrderListCompleted = $soap->call($sessionId, 'order.list',$thesearch);			
 			}
+			
+			$minusInDateTime = strtotime(date("Y-m-d h:m:s", strtotime("$lastUpdatedDate")) . " -1 month");
+			$creditDateTime = date('Y-m-d h:m:s',$minusInDateTime);
+
+			$thesearchForClosed = array(array('updated_at'=>array('gt'=>$creditDateTime), 'status'=>array('eq'=>"closed")));				
+			$resultOrderListClosed = $soap->call($sessionId, 'order.list',$thesearchForClosed);
+			
+
+			$resultOrderList = array_merge($resultOrderListCompleted, $resultOrderListClosed);
 		}
 		catch(Exception $e)
 		{
@@ -1967,8 +2031,7 @@ function ExportOrderData()
 			$flag = $e->getMessage();
 			$responeXml = "fail";
 		}		
-
-		$zz = 0;
+		
 		/*echo "<pre>";
 		print_r($resultOrderList);
 		exit;*/
@@ -1979,7 +2042,7 @@ function ExportOrderData()
 			$catchError = "";
 			$catchProductError = "";		
 
-			$result = $connection->query("SELECT id FROM ".$prefix."bluefish_sale_post WHERE order_id = '".$resultOrderList[$i][increment_id]."'");
+			$result = $connection->query("SELECT id,status FROM ".$prefix."bluefish_sale_post WHERE order_id = '".$resultOrderList[$i][increment_id]."'");
 
 			$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 			$numberRows = count($resultSet);
@@ -1999,7 +2062,9 @@ function ExportOrderData()
 				$customerCodeafterCheck = $credentials['mycustom_customer_number'];
 			}
 			
-			if(($numberRows == 0) && (($customerCodeafterCheck != "") || ($resultOrderList[$i][customer_is_guest] == '1')))
+			$orderStatus = $resultOrderList[$i][status];
+			
+			if((($numberRows == 0 && $orderStatus != "closed") || (($numberRows > 0) && ($orderStatus != $resultSet[0][status]))) && (($customerCodeafterCheck != "") || ($resultOrderList[$i][customer_is_guest] == '1')))
 			{
 			        ### For sale order info
 			        try
@@ -2055,17 +2120,29 @@ function ExportOrderData()
 										<saleHeader>
 										<terminalTransactionNo>".$resultOrderList[$i][increment_id]."</terminalTransactionNo>
 										<storeCode>".$mycustom_bluestorecode."</storeCode>
-										<terminalCode>1</terminalCode>
-										<startDateTime>".$resultOrderList[$i][created_at]."</startDateTime>
-										<endDateTime>".$resultOrderList[$i][updated_at]."</endDateTime>
+										<terminalCode>1</terminalCode>";
+										
+										if($orderStatus == "closed")					
+											$xmlRequest .=	"<startDateTime>".$resultOrderList[$i][updated_at]."</startDateTime>";
+										else
+											$xmlRequest .=	"<startDateTime>".$resultOrderList[$i][created_at]."</startDateTime>";
+													
+													
+									$xmlRequest .=	"<endDateTime>".$resultOrderList[$i][updated_at]."</endDateTime>
 										<sessionID>".$sessionId."</sessionID>
 										<userCode>".$resultcustomer_id."</userCode>
-										<orderCurrencyCode>".$resultOrderList[$i][base_currency_code]."</orderCurrencyCode>
-										<saleAmount>".$saleAmountIncludeTax."</saleAmount>
-										<totalTax>".$resultOrderList[$i][tax_amount]."</totalTax>
-										<amountsIncludeTax>".$AmountsIncludeTax."</amountsIncludeTax>
-										</saleHeader>
-										";
+										<userName>".$bluestoreUserName."</userName>
+										<orderCurrencyCode>".$resultOrderList[$i][base_currency_code]."</orderCurrencyCode>";
+					
+					if($orderStatus == "closed")					
+						$xmlRequest .=	"<saleAmount>-".$saleAmountIncludeTax."</saleAmount>
+								<totalTax>-".$resultOrderList[$i][tax_amount]."</totalTax>";
+					else
+						$xmlRequest .=	"<saleAmount>".$saleAmountIncludeTax."</saleAmount>
+								<totalTax>".$resultOrderList[$i][tax_amount]."</totalTax>";
+						
+								$xmlRequest .=	"<amountsIncludeTax>".$AmountsIncludeTax."</amountsIncludeTax>
+										</saleHeader>";
 
 
 					   ### For sale order info
@@ -2165,11 +2242,22 @@ function ExportOrderData()
 											<categoryCode>".$updateCategoryCode."</categoryCode>
 											<categoryDescription>".$categoryDescription."</categoryDescription>
 											<price>".$resultSalesOrder[items][$j][price]."</price>
-											<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
-											<quantity>".number_format($resultSalesOrder[items][$j][qty_invoiced])."</quantity>
-											<unitOfMeasure>EA</unitOfMeasure>
-											<finalAmount>".$TotalfinalAmount."</finalAmount>
-											<saleItemTaxes>
+											<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>";
+									
+									if($orderStatus == "closed")					
+										$xmlRequest .=	"<quantity>-".number_format($resultSalesOrder[items][$j][qty_invoiced])."</quantity>";
+									else
+										$xmlRequest .=	"<quantity>".number_format($resultSalesOrder[items][$j][qty_invoiced])."</quantity>";
+												
+										$xmlRequest .=	"<unitOfMeasure>EA</unitOfMeasure>";
+										
+									if($orderStatus == "closed")					
+										$xmlRequest .=	"<finalAmount>-".$TotalfinalAmount."</finalAmount>";
+									else
+										$xmlRequest .=	"<finalAmount>".$TotalfinalAmount."</finalAmount>";
+
+										
+										$xmlRequest .=	"<saleItemTaxes>
 											<saleItemTax>
 												<saleItemTaxNo>1</saleItemTaxNo>
 												<taxCode>".$TAXCODE_VAL."</taxCode>
@@ -2218,9 +2306,15 @@ function ExportOrderData()
 									<payment>
 										<paymentNo>".$resultSalesOrder[increment_id]."</paymentNo>
 										<tenderType>2</tenderType>
-										<paymentMethodCode>".$PAYMENTCODE_VAL."</paymentMethodCode>
-										<amount>".$resultSalesOrder[payment][amount_ordered]."</amount>
-										<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
+										<paymentMethodCode>".$PAYMENTCODE_VAL."</paymentMethodCode>";
+
+									if($orderStatus == "closed")					
+										$xmlRequest .=	"<amount>-".$resultSalesOrder[payment][amount_ordered]."</amount>";
+									else
+										$xmlRequest .=	"<amount>".$resultSalesOrder[payment][amount_ordered]."</amount>";
+
+
+										$xmlRequest .=	"<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
 									</payment>
 								</payments>
 								</transactionSale>
@@ -2253,7 +2347,7 @@ function ExportOrderData()
 		$lastUpdatedDateVal = max($updatedTimeArray);
 		Mage::getModel('core/config')->saveConfig('mycustom_section/mycustom_sales_group/mycustom_sales_last_export', $lastUpdatedDateVal);
 	}
-	
+
 	return $responeXml;
 }
 
@@ -2570,7 +2664,7 @@ function ExportProductData()
 		}
 		else
 		{
-			$productListResult = $connection->query("SELECT `sku` FROM ".$prefix."catalog_product_entity");
+			$productListResult = $connection->query("SELECT `entity_id`,`sku`,`updated_at` FROM ".$prefix."catalog_product_entity");
 		}
 		$productList  = $productListResult->fetchAll(PDO::FETCH_ASSOC);
 		

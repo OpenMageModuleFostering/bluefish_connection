@@ -53,11 +53,16 @@ function checkForm(form)
         <h4 style="color: white; margin-left: 20px; padding: 8px 0px 0px;"><?php echo $this->__('Download to File')?></h4>
         <fieldset id="my-fieldset" style="background:white;">
             <table cellspacing="0" class="form-list">
- 				<tr>
+ 		<tr>
                     <td class="label"><?php echo $this->__('Download categories in csv format')?> </td>
                     <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="7" type="button"><span>Export</span></button></td>
                 </tr>
-		    </table>
+ 		<tr>
+                    <td class="label"><?php echo $this->__('Download products in csv format')?> </td>
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="10" type="button"><span>Export</span></button></td>
+                </tr>
+           </table>
+	    <i>(Before downloading products please select either sku mapping or product id mapping with sales import section of configuration settings)</i>
         </fieldset>
     </form>
 </div>
