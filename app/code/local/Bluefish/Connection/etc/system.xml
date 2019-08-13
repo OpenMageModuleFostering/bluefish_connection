@@ -1,0 +1,272 @@
+<?xml version="1.0" ?>
+<config>
+    <sections>
+        <mycustom_section module="connection" translate="label">
+            <label>Bluestore Live</label>
+            <sort_order>200</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <tab>service</tab>
+            <groups>
+                
+				<mycustom_category_group translate="label">
+                    <label>Categories</label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<mycustom_category_defaultminuteschedule translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
+							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+                            <sort_order>10</sort_order>
+							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when categories will be retrieved from bluestore.]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_category_defaultminuteschedule>	
+						
+						<mycustom_category_mapping_direct translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_databasemapping</frontend_model>
+							<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_category_mapping_direct>	
+
+					</fields>
+                </mycustom_category_group>
+				
+				
+				
+                <mycustom_product_group translate="label">
+                    <label>Products</label>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<mycustom_product_commonschedule translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
+							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+                            <sort_order>2</sort_order>
+							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when products will be retrieved from bluestore.]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_product_commonschedule>
+						<mycustom_product_mapping_direct translate="label">
+							<label></label>
+							<frontend_model>bluefish_connection_block_productdatabasemapping</frontend_model>
+							<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</mycustom_product_mapping_direct>						
+					</fields>
+                </mycustom_product_group>				
+				
+                <mycustom_stock_group translate="label">
+                    <label>Stock</label>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<mycustom_stock_commonschedule translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
+							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+                            <sort_order>2</sort_order>
+							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when stock will be retrieved from bluestore.]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_stock_commonschedule>
+						<mycustom_croninstock translate="label">
+                            <label>Min Qty to Display as In Stock</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_croninstock>						
+						<mycustom_bluestorecode translate="label">
+                            <label>Bluestore Store Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_bluestorecode>
+						<mycustom_currentstockversion translate="label">
+                            <label>Current Stock Version</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_currentstockversion>						
+					</fields>
+                </mycustom_stock_group>				
+				
+                <mycustom_customer_group translate="label">
+                    <label>Customers</label>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<mycustom_customer_commonschedule translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
+							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+                            <sort_order>2</sort_order>
+							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when customers will be synchronised with bluestore.]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_customer_commonschedule>
+					</fields>
+                </mycustom_customer_group>								
+				
+                <mycustom_sales_group translate="label">
+                    <label>Sales</label>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<mycustom_sales_commonschedule translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_cronschedule</frontend_model>
+							<backend_model>bluefish_connection_model_validationcrontime</backend_model>
+                            <sort_order>2</sort_order>
+							<comment><![CDATA[Add one or more schedule lines to indicate times during the day when sales will be sent to bluestore.]]></comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_sales_commonschedule>
+						<mycustom_saledefaultcategory translate="label">
+                            <label>Default Category for Sales Posting</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_saledefaultcategory>	
+						<mycustom_customer_number translate="label">
+                            <label>Bluestore Customer Code for Guest Checkout</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_customer_number>							
+					</fields>
+                </mycustom_sales_group>					
+				
+
+                <mycustom_auth_group translate="label">
+                    <label>Authentication</label>
+                    <sort_order>60</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                       	<mycustom_login translate="label">
+                            <label>Magento API Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_login>
+						<mycustom_password translate="label">
+                            <label>Magento API Password</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_password>
+						<mycustom_code translate="label">
+                            <label>Bluestore API Key</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_code>
+						<mycustom_codeapitoken translate="label">
+                            <label>Bluestore API Token</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_codeapitoken>
+						<mycustom_certificate translate="label">
+                            <label>Authentication Certificate - Private Key</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_certificate>
+					</fields>
+                </mycustom_auth_group>					
+
+
+
+                <mycustom_taxcode_group translate="label">
+                    <label>Bluestore Tax Codes</label>
+                    <sort_order>70</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                       	<mycustom_taxcode_rates translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_bluestoretaxcode</frontend_model>
+							<backend_model>bluefish_connection_model_validationtaxcode</backend_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_taxcode_rates>
+					</fields>
+                </mycustom_taxcode_group>					
+				
+
+                <mycustom_payment_group translate="label">
+                    <label>Bluestore Payment Method Mapping</label>
+                    <sort_order>80</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                       	<mycustom_payment_checkmethod translate="label">
+                            <label></label>
+                            <frontend_model>bluefish_connection_block_paymentmethodcode</frontend_model>
+							<backend_model>bluefish_connection_model_validationpaymentmap</backend_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_payment_checkmethod>
+					</fields>
+                </mycustom_payment_group>	
+				
+
+
+            </groups>
+        </mycustom_section>
+    </sections>
+</config>

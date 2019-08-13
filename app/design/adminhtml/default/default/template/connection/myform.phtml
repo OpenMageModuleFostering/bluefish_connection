@@ -1,0 +1,57 @@
+<script type="text/javascript">
+function checkForm(form)
+{
+		document.edit_form.button_name.value = form.value;	
+		editForm.submit();	
+}
+</script>
+
+<div class="content-header" style="width:583px;">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Bluestore Live - Data Exchange')?></h3></td>
+            <td class="a-right">
+               
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit"  style="width:583px;background:#666E73;">
+    <form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/post')?>">
+		
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+		<input name="button_name" type="hidden" value="" />
+        <h4 style="color: white; margin-left: 20px; padding: 8px 0px 0px;"><?php echo $this->__('Import')?></h4>
+        <fieldset id="my-fieldset" style="background:white;">
+            <table cellspacing="3" class="form-list">
+                <tr>
+                    <td colspan="3"><b>Import a specific product, category or customer. Leave the field empty to import all entries</b></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php echo $this->__('Categories')?> </td>
+					<td class="label"><input value="" type="text" name="categorycode" placeholder="category code"></td>
+					<td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="1" type="button"><span>Import</span></button></td>
+                </tr>	
+				<tr>
+                    <td class="label"><?php echo $this->__('Products and Prices')?> </td>
+					<td class="label"><input value="" type="text" name="productcode" placeholder="product code"></td>
+		             <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="2" type="button"><span>Import</span></button></td>
+                </tr>
+				 <tr>
+                    <td class="label"><?php echo $this->__('Stock Quantities')?> </td>
+					<td class="label">&nbsp;</td>					
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="3" type="button"><span>Import</span></button></td>
+                </tr>
+				<tr>
+                    <td class="label"><?php echo $this->__('Customers')?> </td>
+					<td class="label"><input value="" type="text" name="customercode" placeholder="customer code"></td>		
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="4" type="button"><span>Import</span></button></td>
+                </tr>
+		    </table>
+			<i>Bluestore Data Exchange is configured in System - Configuration under Services - Bluestore Live.</i>
+        </fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>

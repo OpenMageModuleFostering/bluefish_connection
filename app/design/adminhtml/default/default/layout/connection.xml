@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<connection_adminhtml_myform_index>
+        <reference name="content">
+            <block type="adminhtml/template" name="myform" template="connection/myform.phtml"/>
+        </reference>
+    </connection_adminhtml_myform_index>
+	<connection_adminhtml_myformexport_index>
+        <reference name="content">
+            <block type="adminhtml/template" name="myform" template="connection/myformexport.phtml"/>
+        </reference>
+    </connection_adminhtml_myformexport_index>
+</layout>

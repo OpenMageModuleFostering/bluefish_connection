@@ -1,0 +1,63 @@
+<script type="text/javascript">
+function checkForm(form)
+{
+		document.edit_form.button_name.value = form.value;
+		editForm.submit();
+}
+</script>
+
+<div class="content-header" style="width:583px;">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Bluestore Live - Data Exchange')?></h3></td>
+            <td class="a-right">
+               
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<div class="entry-edit" style="width:583px;background:#666E73;">
+    <form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/post')?>">
+		
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+		<input name="button_name" type="hidden" value="" />
+        <h4 style="color: white; margin-left: 20px; padding: 8px 0px 0px;"><?php echo $this->__('Export')?></h4>
+        <fieldset id="my-fieldset" style="background:white;">
+            <table cellspacing="0" class="form-list">
+ 				<tr>
+                    <td class="label"><?php echo $this->__('Customers')?> </td>
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="6" type="button"><span>Export</span></button></td>
+                </tr>
+				<tr>
+                    <td class="label"><?php echo $this->__('Completed Sales')?> </td>
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="5" type="button"><span>Export</span></button></td>
+                </tr>
+		    </table>
+			<i>Bluestore Data Exchange is configured in System - Configuration under Services - Bluestore Live.</i>
+        </fieldset>
+    </form>
+</div>
+
+
+<div class="entry-edit" style="width:583px;background:#666E73;" >
+    <form id="edit_form_cat" name="edit_form_cat" method="post" action="<?php echo $this->getUrl('*/*/post')?>">
+		
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+		<input name="button_name" type="hidden" value="" />
+        <h4 style="color: white; margin-left: 20px; padding: 8px 0px 0px;"><?php echo $this->__('Download to File')?></h4>
+        <fieldset id="my-fieldset" style="background:white;">
+            <table cellspacing="0" class="form-list">
+ 				<tr>
+                    <td class="label"><?php echo $this->__('Download categories in csv format')?> </td>
+                    <td class="input-ele"> <button onclick="return checkForm(this);" class="scalable save" value="7" type="button"><span>Export</span></button></td>
+                </tr>
+		    </table>
+        </fieldset>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>
