@@ -287,6 +287,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				$xmlData = $xmlObj->getNode();	
 
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+				$prefix 	= Mage::getConfig()->getTablePrefix();
 				
 				$ResposeData    = $xmlData->transactionsBatch;
 				
@@ -296,7 +297,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					if($row->batchSuccess == "true")
 					{
 						$code 			= strval($row->transaction['docNo']);
-						$connection->query("INSERT INTO bluefish_sale_post(id,order_id,posted_time)
+						$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
 												 VALUES('','".$code."','".now()."')");	
 					    $countSuccess++;												 
 					}	
@@ -370,6 +371,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				$xmlData = $xmlObj->getNode();
 
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+				$prefix 	= Mage::getConfig()->getTablePrefix();
 				
 				$responseCode   = $xmlData->transactionsBatch->batchSuccess;
 				$ResposeData    = $xmlData->transactionsBatch;
@@ -378,7 +380,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				{
 					 $code 			= strval($row->transaction['docNo']);
 					 $bluestoreRef	= $row->transaction->bluestoreRef;
-					 $CustomerUpdate = $connection->query("UPDATE bluefish_customer SET customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
+					 $CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
 				}
 				return $responseCode;
 			}
@@ -546,8 +548,9 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				$extraStoreCode 	 = $stock_credentials['mycustom_bluestorecode'];
 
 				$connection 		 = Mage::getSingleton('core/resource')->getConnection('core_write');
+				$prefix 			 = Mage::getConfig()->getTablePrefix();
 				
-				$resultCoreConfig 	 = $connection->query("select value from core_config_data where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
+				$resultCoreConfig 	 = $connection->query("select value from ".$prefix."core_config_data where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
 				$resultSetCoreConfig  = $resultCoreConfig->fetchAll(PDO::FETCH_ASSOC);
 				
 				$numberCoreConfig     = count($resultSetCoreConfig);

@@ -10,4 +10,14 @@
             <block type="adminhtml/template" name="myform" template="connection/myformexport.phtml"/>
         </reference>
     </connection_adminhtml_myformexport_index>
+    <connection_adminhtml_bluestorecron_index>
+        <reference name="content">
+            <block type="connection/adminhtml_bluestorecron" name="bluestorecron" />
+        </reference>
+    </connection_adminhtml_bluestorecron_index>
+	<connection_adminhtml_bluestorescheduler_index>
+        <reference name="content">
+            <block type="connection/adminhtml_bluestorescheduler" name="bluestorescheduler" />
+        </reference>
+    </connection_adminhtml_bluestorescheduler_index>	
 </layout>

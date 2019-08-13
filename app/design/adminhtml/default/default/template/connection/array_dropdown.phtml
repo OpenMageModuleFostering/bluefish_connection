@@ -44,14 +44,20 @@ switch ($blockElement) {
     case (stristr($blockElement, "mycustom_taxcode_group") == true):
         $blockName = "mycustom_taxcode_group";
 		$categoryDefaultTime = Array("0.0000::UK0","20.0000::UK1");		
-        break;		
+        break;	
+    case (stristr($blockElement, "mycustom_chargecode_group") == true):
+        $blockName = "mycustom_chargecode_group";
+		$categoryDefaultTime = Array("Fixed amount::1","Percentage::2");		
+        break;			
 	}
 	
-$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
+$connection = Mage::getSingleton('core/resource')->getConnection('core_write');  
+$prefix 	= Mage::getConfig()->getTablePrefix(); 
 
-$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_auth_group/mycustom_login'");
+$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_auth_group/mycustom_login'");
 $resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 $numberRows 	 = count($resultCronPath);
+$numberRows = 0;
 ?>
 
 <div class="grid" id="grid<?php echo $_htmlId ?>">
@@ -256,8 +262,21 @@ Event.observe(window, 'load', function () {
 	<?php
 	} ?>
 });
-<?php } ?>
+<?php } elseif (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_chargecode_group")){?>
+Event.observe(window, 'load', function () {
+    $('grid<?php echo $_htmlId ?>').show();
+    $('empty<?php echo $_htmlId ?>').hide();
 
+	<?php
+	
+	for($i=0;$i<count($categoryDefaultTime);$i++)
+	{
+	?>
+		arrayRow<?php echo $_htmlId ?>.add('', '','<?php echo $categoryDefaultTime[$i] ?>');
+	<?php
+	} ?>
+});
+<?php } ?>
 
 
 

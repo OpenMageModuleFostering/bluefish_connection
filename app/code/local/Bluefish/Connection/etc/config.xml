@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Bluefish_Connection>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </Bluefish_Connection>
     </modules>
     <frontend>
@@ -42,7 +42,7 @@
 				<children>
 					<items module="connection">
 						<title>Import</title>
-						<sort_order>0</sort_order>
+						<sort_order>10</sort_order>
 						<action>connection/adminhtml_myform</action>
 					</items>
 					<export module="connection">
@@ -50,6 +50,16 @@
 						<sort_order>20</sort_order>
 						<action>connection/adminhtml_myformexport</action>
 					</export>
+					<enablecron module="connection">
+						<title>Enable/Disable Bluestore Cron Jobs</title>
+						<sort_order>30</sort_order>
+						<action>connection/adminhtml_bluestorecron</action>
+					</enablecron>
+					<monitorcron module="connection">
+						<title>Monitor Scheduled Tasks</title>
+						<sort_order>40</sort_order>
+						<action>connection/adminhtml_bluestorescheduler</action>
+					</monitorcron>						
 				</children>
      		</connection>
 		</menu>
@@ -138,11 +148,11 @@
 	<crontab>
 	<jobs>
             <bluefish_connection_category>
-                <schedule><cron_expr>15 23 * * *</cron_expr></schedule>
+                <schedule><cron_expr>0 17 * * *</cron_expr></schedule>
                 <run><model>connection/observer::categoryImport</model></run>
             </bluefish_connection_category>
 			<bluefish_connection_product>
-                <schedule><cron_expr>30 0 * * *</cron_expr></schedule>
+                <schedule><cron_expr>47 11 * * *</cron_expr></schedule>
                 <run><model>connection/observer::productImport</model></run>
             </bluefish_connection_product>
 			<bluefish_connection_stock>
@@ -179,7 +189,13 @@
     		</mycustom_sales_group>
     	</mycustom_section>
     </default>	
-	
+	<default>
+    	<mycustom_section>
+    		<mycustom_sales_group>
+    			<mycustom_sale_chargescode>1</mycustom_sale_chargescode>
+    		</mycustom_sales_group>
+    	</mycustom_section>
+    </default>		
 	
 	<default>
     	<mycustom_section>

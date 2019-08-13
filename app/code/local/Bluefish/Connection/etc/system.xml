@@ -168,7 +168,15 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </mycustom_customer_number>							
+                        </mycustom_customer_number>	
+						<mycustom_sale_chargescode translate="label">
+                            <label>Bluestore Charge Code for Delivery Charges</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mycustom_sale_chargescode>							
 					</fields>
                 </mycustom_sales_group>					
 				
@@ -265,8 +273,26 @@
                 </mycustom_payment_group>	
 				
 
-
             </groups>
         </mycustom_section>
+		
+		<system>
+			<groups>
+				<cron translate="label comment" module="cron">
+					<fields>
+						<disabled_crons translate="label">
+							<label>Disabled cron tasks</label>
+							<frontend_type>text</frontend_type>
+							<comment><![CDATA[Do not edit this field manually.]]></comment>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</disabled_crons>
+					</fields>
+				</cron>
+			</groups>
+		</system>
+		
     </sections>
 </config>

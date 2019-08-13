@@ -60,8 +60,9 @@ switch ($blockElement) {
 	}
 	
 $connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
+$prefix 	= Mage::getConfig()->getTablePrefix(); 
 
-$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_auth_group/mycustom_login'");
+$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_auth_group/mycustom_login'");
 $resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 $numberRows 	 = count($resultCronPath);
 

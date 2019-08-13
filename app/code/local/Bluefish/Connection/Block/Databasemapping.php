@@ -49,8 +49,8 @@ class Bluefish_Connection_Block_Databasemapping extends Mage_Adminhtml_Block_Sys
     protected function _renderCellTemplate($columnName)
     {
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
-		
-		$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
+		$prefix 	= Mage::getConfig()->getTablePrefix();
+		$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
 		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 		$numberRows 	 = count($resultCronPath);
 		

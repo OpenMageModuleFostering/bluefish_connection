@@ -8,6 +8,7 @@ class Bluefish_Connection_Adminhtml_ProductdataController extends Mage_Adminhtml
 	public function indexAction()
     {
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 			extract($_GET);
 			extract($_REQUEST);
 			$error = "";
@@ -25,13 +26,13 @@ class Bluefish_Connection_Adminhtml_ProductdataController extends Mage_Adminhtml
 
 				if($error == "")	
 				{
-					$resultExist 	 = $connection->query("select * from bluefish_product WHERE (product_code = '".$txtAddCode."' OR product_id = '".$txtAddCategoryID."')");
+					$resultExist 	 = $connection->query("select * from ".$prefix."bluefish_product WHERE (product_code = '".$txtAddCode."' OR product_id = '".$txtAddCategoryID."')");
 					$resultExistSet  = $resultExist->fetchAll(PDO::FETCH_ASSOC);
 					$numberExistRows = count($resultExistSet);
 					
 					if($numberExistRows == 0)
 					{
-						$connection->query("INSERT INTO bluefish_product(id,product_code,category_id,product_id,created_time,update_time)
+						$connection->query("INSERT INTO ".$prefix."bluefish_product(id,product_code,category_id,product_id,created_time,update_time)
 											VALUES('','".$txtAddCode."' ,'".$txtAddMagentoCategoryID."' ,'".$txtAddCategoryID."','".now()."','')");
 						$txtAddCode 		= "";
 						$txtAddCategoryID	= "";
@@ -54,13 +55,13 @@ class Bluefish_Connection_Adminhtml_ProductdataController extends Mage_Adminhtml
 					
 				if($errorupdate == "")	
 				{
-					$resultupdate 	 = $connection->query("select * from bluefish_product WHERE (product_code = '".$txtEditCode."' OR product_id = '".$txtEditCategoryID."') and id != '".$hdnEditCustomerID."'");
+					$resultupdate 	 = $connection->query("select * from ".$prefix."bluefish_product WHERE (product_code = '".$txtEditCode."' OR product_id = '".$txtEditCategoryID."') and id != '".$hdnEditCustomerID."'");
 					$resultUpdateSet  = $resultupdate->fetchAll(PDO::FETCH_ASSOC);
 					$numberUpdateRows = count($resultUpdateSet);
 					
 					if($numberUpdateRows == 0)
 					{			
-						$connection->query("UPDATE bluefish_product SET product_code= '".$txtEditCode."',category_id= '".$txtMagentoCategoryID."',product_id= '".$txtEditCategoryID."' where id = '".$hdnEditCustomerID."'");
+						$connection->query("UPDATE ".$prefix."bluefish_product SET product_code= '".$txtEditCode."',category_id= '".$txtMagentoCategoryID."',product_id= '".$txtEditCategoryID."' where id = '".$hdnEditCustomerID."'");
 						$success .= "Record successfully Updated.<br>";
 					}
 					else
@@ -71,10 +72,10 @@ class Bluefish_Connection_Adminhtml_ProductdataController extends Mage_Adminhtml
 			##### Delete Condition
 			if($_GET["Action"] == "Del")
 			{
-				$connection->query("DELETE FROM bluefish_product where id = '".$_GET[ConnectionID]."'");
+				$connection->query("DELETE FROM ".$prefix."bluefish_product where id = '".$_GET[ConnectionID]."'");
 			}
 		
-		$result = $connection->query("select * from bluefish_product");
+		$result = $connection->query("select * from ".$prefix."bluefish_product");
 		$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 		$numberRows = count($resultSet);
 		?>

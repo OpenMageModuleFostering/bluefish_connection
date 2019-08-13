@@ -49,8 +49,9 @@ class Bluefish_Connection_Block_Productdatabasemapping extends Mage_Adminhtml_Bl
     protected function _renderCellTemplate($columnName)
     {
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');   
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_product_group/mycustom_product_mapping_direct'");
+		$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_product_group/mycustom_product_mapping_direct'");
 		$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 		$numberRows 	 = count($resultCronPath);
 		

@@ -13,8 +13,9 @@ function cron_insert_update2()
 		$xmlFile = "$varpath/etc/config.xml";
 		$doc->load($xmlFile);
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultStock = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_stock_group/mycustom_stock_commonschedule'");
+		$resultStock = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_stock_group/mycustom_stock_commonschedule'");
 		$resultStockIteration  = $resultStock->fetchAll(PDO::FETCH_ASSOC);
 		$StockIterationCounter = $resultStockIteration[0][loopCounter];
 		$StockCounterDB 	   = $resultStockIteration[0][loopIteration];
@@ -49,7 +50,7 @@ function cron_insert_update2()
 		
 		$Stock_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 		
-		$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultStockIteration[0][id]."'");						
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultStockIteration[0][id]."'");						
 
 		$markers=$doc->getElementsByTagName('bluefish_connection_stock');
 		foreach ($markers as $marker)
@@ -79,8 +80,9 @@ function cron_insert_update1()
 		$xmlFile = "$varpath/etc/config.xml";
 		$doc->load($xmlFile);
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultProduct = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_product_group/mycustom_product_commonschedule'");
+		$resultProduct = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_product_group/mycustom_product_commonschedule'");
 		$resultProductIteration  = $resultProduct->fetchAll(PDO::FETCH_ASSOC);
 		$ProductIterationCounter = $resultProductIteration[0][loopCounter];
 		$ProductCounterDB 		 = $resultProductIteration[0][loopIteration];
@@ -115,7 +117,7 @@ function cron_insert_update1()
 
 		$Product_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 
-		$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultProductIteration[0][id]."'");						
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultProductIteration[0][id]."'");						
 
 		$markers=$doc->getElementsByTagName('bluefish_connection_product');
 		foreach ($markers as $marker)
@@ -144,8 +146,9 @@ function cron_insert_update()
 			$xmlFile = "$varpath/etc/config.xml";
 			$doc->load($xmlFile);
 			$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+			$prefix 	= Mage::getConfig()->getTablePrefix();
 			
-			$resultCategory = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_category_group/mycustom_category_defaultminuteschedule'");
+			$resultCategory = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_category_group/mycustom_category_defaultminuteschedule'");
 			$resultCategoryIteration  = $resultCategory->fetchAll(PDO::FETCH_ASSOC);
 			$categoryIterationCounter = $resultCategoryIteration[0][loopCounter];
 			$categoryCounterDB 		  = $resultCategoryIteration[0][loopIteration];
@@ -180,7 +183,7 @@ function cron_insert_update()
 			
 			$category_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 			
-			$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCategoryIteration[0][id]."'");				
+			$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCategoryIteration[0][id]."'");				
 
 			$markers = $doc->getElementsByTagName('bluefish_connection_category');
 
@@ -211,8 +214,9 @@ try
 		$xmlFile = "$varpath/etc/config.xml";
 		$doc->load($xmlFile);
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultCustomer = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule'");
+		$resultCustomer = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule'");
 		$resultCustomerIteration  = $resultCustomer->fetchAll(PDO::FETCH_ASSOC);
 		$CustomerIterationCounter = $resultCustomerIteration[0][loopCounter];
 		$CustomerCounterDB 	   = $resultCustomerIteration[0][loopIteration];
@@ -247,7 +251,7 @@ try
 		
 		$Customer_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 		
-		$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCustomerIteration[0][id]."'");	
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCustomerIteration[0][id]."'");	
 		
 		$markers=$doc->getElementsByTagName('bluefish_connection_customer');
 		$markersexport =$doc->getElementsByTagName('bluefish_connection_customerexport');
@@ -393,7 +397,8 @@ function insert_update_database2()
 	if(count($xmlData) > 0)
 	{
 		$versionVal = max($updatesversionVal);
-		$coreConfigUpdate = $connection->query("UPDATE core_config_data SET value = '".$versionVal."' where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
+		$prefix 	= Mage::getConfig()->getTablePrefix();
+		$coreConfigUpdate = $connection->query("UPDATE ".$prefix."core_config_data SET value = '".$versionVal."' where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
 	}
 	
 	$flag = "success";
@@ -423,8 +428,9 @@ function insert_update_database1()
 	Mage::log('Product Import started ......', null, './Bluestore_product.log.text');
 
 	$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+	$prefix 	= Mage::getConfig()->getTablePrefix();
 
-	$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
+	$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
 	$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 	$numberRowsConfig= count($resultCronPath);
 	
@@ -453,7 +459,7 @@ function insert_update_database1()
 			{
 				if($unserielVal['#{_id}']['Dbmapping'] == 'Mapping')
 				{
-					$result = $connection->query("select code,category_id from bluefish_category WHERE code = '".$categoryCode."'");
+					$result = $connection->query("select code,category_id from ".$prefix."bluefish_category WHERE code = '".$categoryCode."'");
 					$resultSet  = $result->fetchAll(PDO::FETCH_ASSOC);
 					$numberRows = count($resultSet);
 
@@ -461,7 +467,7 @@ function insert_update_database1()
 					{
 						try
 							{
-								$resultProduct = $connection->query("select product_code,product_id,category_id from bluefish_product WHERE product_code = '".$codeSKU."'");
+								$resultProduct = $connection->query("select product_code,product_id,category_id from ".$prefix."bluefish_product WHERE product_code = '".$codeSKU."'");
 								$resultSetProduct  = $resultProduct->fetchAll(PDO::FETCH_ASSOC);
 								$numberProductRows = count($resultSetProduct);
 								
@@ -502,7 +508,7 @@ function insert_update_database1()
 											'tax_class_id' => 1
 										)));
 										
-										$resultInSert = $connection->query("INSERT INTO bluefish_product(id,category_id,product_id,product_code,created_time,update_time)
+										$resultInSert = $connection->query("INSERT INTO ".$prefix."bluefish_product(id,category_id,product_id,product_code,created_time,update_time)
 														VALUES('','".$resultSet[0][category_id]."','".$ProductID."','".$codeSKU."','".now()."','')");									
 									}
 									catch(Exception $e)
@@ -523,14 +529,14 @@ function insert_update_database1()
 											'name' => "$name",
 											'price' => "$price"
 										)));
-										$resultUpdate = $connection->query("UPDATE bluefish_product SET update_time= '".now()."' where product_code = '".$codeSKU."'");
+										$resultUpdate = $connection->query("UPDATE ".$prefix."bluefish_product SET update_time= '".now()."' where product_code = '".$codeSKU."'");
 									}
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
 										if($flag == "Product not exists.")
 										{
-											$result = $connection->query("delete from bluefish_product WHERE product_code = '".$codeSKU."'");
+											$result = $connection->query("delete from ".$prefix."bluefish_product WHERE product_code = '".$codeSKU."'");
 
 											try
 											{
@@ -549,7 +555,7 @@ function insert_update_database1()
 													'tax_class_id' => 1
 												)));
 
-												$resultInSert = $connection->query("INSERT INTO bluefish_product(id,category_id,product_id,product_code,created_time,update_time)
+												$resultInSert = $connection->query("INSERT INTO ".$prefix."bluefish_product(id,category_id,product_id,product_code,created_time,update_time)
 																VALUES('','".$resultSet[0][category_id]."','".$ProductID."','".$codeSKU."','".now()."','')");
 											}
 											catch(Exception $e)
@@ -575,7 +581,7 @@ function insert_update_database1()
 				}
 				if($unserielVal['#{_id}']['Dbmapping'] == 'Direct')	
 				{ 
-					$resultDirect = $connection->query("select code,category_id from bluefish_category WHERE code = '".$categoryCode."'");
+					$resultDirect = $connection->query("select code,category_id from ".$prefix."bluefish_category WHERE code = '".$categoryCode."'");
 					$resultSetDirect  = $resultDirect->fetchAll(PDO::FETCH_ASSOC);
 					$numberRowsDirect = count($resultSetDirect);
 	
@@ -692,8 +698,9 @@ function insert_update_database()
 	Mage::log('Category Import started ......', null, './Bluestore_category.log.text');
 
 	$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+	$prefix 	= Mage::getConfig()->getTablePrefix();
 
-	$resultPath      = $connection->query("select value from core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
+	$resultPath      = $connection->query("select value from ".$prefix."core_config_data WHERE path = 'mycustom_section/mycustom_category_group/mycustom_category_mapping_direct'");
 	$resultCronPath  = $resultPath->fetchAll(PDO::FETCH_ASSOC);
 	$numberRows 	 = count($resultCronPath);
 	
@@ -733,7 +740,7 @@ function insert_update_database()
 
 			if($deleted == "false")
 			{
-				$result = $connection->query("select code,category_id from bluefish_category WHERE code = '".$code."'");
+				$result = $connection->query("select code,category_id from ".$prefix."bluefish_category WHERE code = '".$code."'");
 				$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 				$numberRows = count($resultSet);	
 				
@@ -751,7 +758,7 @@ function insert_update_database()
 										'available_sort_by'=>'price',
 										'default_sort_by'=>'price'
 									   )));
-								$result = $connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+								$result = $connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 												VALUES('','".$code."','".$newCategoryId."','".now()."','')");
 							}
 							catch(Exception $e)
@@ -771,14 +778,14 @@ function insert_update_database()
 										'available_sort_by'=>'price',
 										'default_sort_by'=>'price'
 									   )));
-									$result = $connection->query("UPDATE bluefish_category SET update_time= '".now()."' where code = '".$code."'");
+									$result = $connection->query("UPDATE ".$prefix."bluefish_category SET update_time= '".now()."' where code = '".$code."'");
 							}
 							catch(Exception $e)
 							{
 									$flag = $e->getMessage();
 									if($flag == "Category not exists.")
 									{
-										$result = $connection->query("delete from bluefish_category WHERE code = '".$code."'");
+										$result = $connection->query("delete from ".$prefix."bluefish_category WHERE code = '".$code."'");
 
 										try
 										{
@@ -790,7 +797,7 @@ function insert_update_database()
 													'available_sort_by'=>'price',
 													'default_sort_by'=>'price'
 												   )));
-											$result = $connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+											$result = $connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 															VALUES('','".$code."','".$newCategoryId."','".now()."','')");
 										}
 										catch(Exception $e)
@@ -826,7 +833,7 @@ function insert_update_database()
 												'available_sort_by'=>'price',
 												'default_sort_by'=>'price'
 											   )));
-										$result = $connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+										$result = $connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 														VALUES('','".$code."','".$newCategoryId."','".now()."','')");
 									}
 									catch(Exception $e)
@@ -863,7 +870,7 @@ function insert_update_database()
 												'available_sort_by'=>'price',
 												'default_sort_by'=>'price'
 											   )));
-										$result = $connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+										$result = $connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 														VALUES('','".$code."','".$newCategoryId."','".now()."','')");
 									}
 									catch(Exception $e)
@@ -890,14 +897,14 @@ function insert_update_database()
 										'default_sort_by'=>'price'
 									   )));	
 								
-								$result = $connection->query("UPDATE bluefish_category SET update_time= '".now()."' where code = '".$code."'");		
+								$result = $connection->query("UPDATE ".$prefix."bluefish_category SET update_time= '".now()."' where code = '".$code."'");		
 							}
 							catch(Exception $e)
 							{
 								$flag = $e->getMessage();
 								if($flag == "Category not exists.")
 								{
-									$result = $connection->query("delete from bluefish_category WHERE code = '".$code."'");
+									$result = $connection->query("delete from ".$prefix."bluefish_category WHERE code = '".$code."'");
 
 									try
 									{
@@ -909,7 +916,7 @@ function insert_update_database()
 												'available_sort_by'=>'price',
 												'default_sort_by'=>'price'
 											   )));
-										$result = $connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+										$result = $connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 														VALUES('','".$code."','".$newCategoryId."','".now()."','')");
 									}
 									catch(Exception $e)
@@ -988,7 +995,9 @@ function insert_update_database3()
 			$email  		=	$xmlData->customer[$i]->address->email;
 
 			$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-			$result = $connection->query("SELECT id,customer_id,address_id FROM `bluefish_customer` WHERE customer_code = '".$code."'");
+			$prefix 	= Mage::getConfig()->getTablePrefix();
+			
+			$result = $connection->query("SELECT id,customer_id,address_id FROM ".$prefix."bluefish_customer WHERE customer_code = '".$code."'");
 
 			$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 			$numberRows = count($resultSet);
@@ -997,7 +1006,7 @@ function insert_update_database3()
 			{
 				try
 				{
-					$customerID = $soap->call($sessionId,'customer.create',array(array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName", 'website_id' => 1, 'store_id' => 1, 'group_id' => 1,'created_at'=> "$createdOn")));
+					$customerID = $soap->call($sessionId,'customer.create',array(array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName", 'prefix' => "$title", 'website_id' => 1, 'store_id' => 1, 'group_id' => 1,'created_at'=> "$createdOn")));
 					$address_id = "";
 
 					if(($city != "") && ($postalCode !="") && ($phone1 != "") && ($street1 != ""))
@@ -1017,7 +1026,7 @@ function insert_update_database3()
 						Mage::log('Customer : '.$customerID.' address not created. City, Postal Code, Phone Number OR Street address is blank.', null, './Bluestore_customer.log.text');
 					}
 
-					$InsertCus = $connection->query("INSERT INTO bluefish_customer(id,customer_id,address_id,customer_code,created_time,update_time)
+					$InsertCus = $connection->query("INSERT INTO ".$prefix."bluefish_customer(id,customer_id,address_id,customer_code,created_time,update_time)
 									VALUES('','".$customerID."','".$address_id."','".$code."','".now()."','')");
 
 					Mage::log('Customer '.$customerID.' Created.', null, './Bluestore_customer.log.text');
@@ -1037,14 +1046,14 @@ function insert_update_database3()
 					$customerIdForupadte = $resultSet[0]['customer_id'];
 					$addressIdForupadte  = $resultSet[0]['address_id'];
 
-					$customerUpdate = $soap->call($sessionId,'customer.update',array('customerId' => "$customerIdForupadte",'customerData' => array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName")));
+					$customerUpdate = $soap->call($sessionId,'customer.update',array('customerId' => "$customerIdForupadte",'customerData' => array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName", 'prefix' => "$title")));
 
 					if(($addressIdForupadte > 0) && ($city != "") && ($postalCode !="") && ($phone1 != "") && ($street1 != ""))
 					{
 						$soap->call($sessionId,'customer_address.update',array('addressId' => "$addressIdForupadte",'addressdata' => array('firstname' => "$firstName", 'lastname' => "$lastName", 'street' => array("$street1", "$street2", "$street3"), 'city' => "$city", 'country_id' => "$country", 'region' => "$stateOrRegion", 'postcode' => "$postalCode", 'telephone' => "$phone1", 'is_default_billing' => "$isBilling", 'is_default_shipping' => "$isDelivery", 'company' => "$companyName", 'prefix' => "$title")));
 					}
 
-					$CustomerUpdate = $connection->query("UPDATE bluefish_customer SET update_time= '".now()."' where customer_code = '".$code."'");
+					$CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET update_time= '".now()."' where customer_code = '".$code."'");
 
 					Mage::log('Customer '.$customerID.' Updated.', null, './Bluestore_customer.log.text');
 					$flag = "success";
@@ -1055,11 +1064,11 @@ function insert_update_database3()
 
 					if($flag == "Customer not exists.")
 					{
-						$result = $connection->query("delete from bluefish_customer WHERE customer_code = '".$code."'");
+						$result = $connection->query("delete from ".$prefix."bluefish_customer WHERE customer_code = '".$code."'");
 
 						try
 						{
-							$customerID = $soap->call($sessionId,'customer.create',array(array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName", 'website_id' => 1, 'store_id' => 1, 'group_id' => 1,'created_at'=> "$createdOn")));
+							$customerID = $soap->call($sessionId,'customer.create',array(array('email' => "$email", 'firstname' => "$firstName", 'lastname' => "$lastName", 'prefix' => "$title", 'website_id' => 1, 'store_id' => 1, 'group_id' => 1,'created_at'=> "$createdOn")));
 							$address_id = "";
 
 							if(($city != "") && ($postalCode !="") && ($phone1 != "") && ($street1 != ""))
@@ -1075,7 +1084,7 @@ function insert_update_database3()
 								}
 							}
 
-							$InsertCus = $connection->query("INSERT INTO bluefish_customer(id,customer_id,address_id,customer_code,created_time,update_time)
+							$InsertCus = $connection->query("INSERT INTO ".$prefix."bluefish_customer(id,customer_id,address_id,customer_code,created_time,update_time)
 											VALUES('','".$customerID."','".$address_id."','".$code."','".now()."','')");
 
 							Mage::log('Customer '.$customerID.' Created.', null, './Bluestore_customer.log.text');
@@ -1114,8 +1123,6 @@ function ExportOrderData()
 	$credentials_storecode  = Mage::getStoreConfig('mycustom_section/mycustom_stock_group');
 	$mycustom_bluestorecode = $credentials_storecode['mycustom_bluestorecode'];
 
-	$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-
 	$soap		   = new SoapClient($mage_url);
 	$sessionId     = $soap->login($mage_user, $mage_api_key);
 
@@ -1128,8 +1135,9 @@ function ExportOrderData()
 		$xmlFile = "$varpath/etc/config.xml";
 		$doc->load($xmlFile);
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultSale = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_sales_group/mycustom_sales_commonschedule'");
+		$resultSale = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_sales_group/mycustom_sales_commonschedule'");
 		$resultSaleIteration  = $resultSale->fetchAll(PDO::FETCH_ASSOC);
 
 		$SaleIterationCounter = $resultSaleIteration[0][loopCounter];
@@ -1165,7 +1173,7 @@ function ExportOrderData()
 		
 		$Sale_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 		
-		$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultSaleIteration[0][id]."'");
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultSaleIteration[0][id]."'");
 
 		$markers=$doc->getElementsByTagName('bluefish_connection_orderexport');
 		foreach ($markers as $marker)
@@ -1178,7 +1186,11 @@ function ExportOrderData()
 			
 		try
 		{
-			$resultOrderList = $soap->call($sessionId, 'order.list',array(array('status'=>array('eq'=>'complete'))));
+			$thedate = date("Y-m-d", strtotime("-2 month"));
+			$thesearch =array(array('updated_at'=>array('from'=>"$thedate"), 'status'=>array('eq'=>"complete")));
+			$resultOrderList = $soap->call($sessionId, 'order.list', $thesearch); 	
+
+			#$thesearch =array(array('updated_at'=>array('from'=>"$thedate"),'increment_id'=>array('200002634'), 'status'=>array('eq'=>"complete")));			
 		}
 		catch(Exception $e)
 		{
@@ -1200,12 +1212,12 @@ function ExportOrderData()
 			
 			#if($resultOrderList[$i][increment_id] == "100000002") # This one
 			#{ # and this one
-				$result = $connection->query("SELECT id FROM `bluefish_sale_post` WHERE order_id = '".$resultOrderList[$i][increment_id]."'");
+				$result = $connection->query("SELECT id FROM ".$prefix."bluefish_sale_post WHERE order_id = '".$resultOrderList[$i][increment_id]."'");
 
 				$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 				$numberRows = count($resultSet);
 
-				$resultCustomer = $connection->query("SELECT id,customer_code FROM `bluefish_customer` WHERE customer_id = '".$resultOrderList[$i][customer_id]."'");
+				$resultCustomer = $connection->query("SELECT id,customer_code FROM ".$prefix."bluefish_customer WHERE customer_id = '".$resultOrderList[$i][customer_id]."'");
 
 				$resultSetCustomer = $resultCustomer->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1250,7 +1262,7 @@ function ExportOrderData()
 							}
 						}
 					}	
-					if($catchError != "fail")
+					if($catchProductError == "")
 					{					
 						if($zz == 0)
 						{
@@ -1264,10 +1276,11 @@ function ExportOrderData()
 							$customerFullName = $resultOrderList[$i][customer_firstname]." ".$resultOrderList[$i][customer_lastname];
 						$docNO  = $zz+1;
 
-						$AmountsIncludeTax = ($resultOrderList[$i][tax_amount] > 0)?'TRUE':'FALSE';
+						$AmountsIncludeTax = ($resultOrderList[$i][tax_amount] > 0)?'true':'false';
 						$saleAmountIncludeTax = $resultOrderList[$i][total_paid];
 
 						$xmlRequest .= "<batch batchNo=\"".$docNO."\">
+										  <transactionSales>
 											<transactionSale docNo=\"".$resultOrderList[$i][increment_id]."\">
 											<postStockMovements>true</postStockMovements>
 											<saleHeader>
@@ -1278,9 +1291,6 @@ function ExportOrderData()
 											<endDateTime>".$resultOrderList[$i][updated_at]."</endDateTime>
 											<sessionID>".$sessionId."</sessionID>
 											<userCode>".$resultcustomer_id."</userCode>
-											<userName></userName>
-											<userFullName></userFullName>
-											<originalTxnCode></originalTxnCode>
 											<orderCurrencyCode>".$resultOrderList[$i][base_currency_code]."</orderCurrencyCode>
 											<saleAmount>".$saleAmountIncludeTax."</saleAmount>
 											<totalTax>".$resultOrderList[$i][tax_amount]."</totalTax>
@@ -1299,21 +1309,24 @@ function ExportOrderData()
 								$flag = $e->getMessage();
 								Mage::log('Problem in sales_order.info '.$flag.' Exported.', null, './Bluestore_salesorder.log.text');
 							}				   
-
+							
+							$SalefirstName = str_ireplace("&", "&#x26;", $resultSalesOrder[customer_firstname]);
+							$SalelastName = str_ireplace("&", "&#x26;", $resultSalesOrder[customer_lastname]);
 							$street1Addr = str_ireplace("&", "&#x26;", $resultSalesOrder[shipping_address][street]);
+							
 							$xmlRequest .= "<customer>
 												<countryCode>".$resultSalesOrder[shipping_address][country_id]."</countryCode>
 												<customerCode>".$customerCodeafterCheck."</customerCode>
 												<email>".$resultSalesOrder[customer_email]."</email>
-												<firstName>".$resultSalesOrder[customer_firstname]."</firstName>
-												<lastName>".$resultSalesOrder[customer_lastname]."</lastName>
+												<firstName>".$SalefirstName."</firstName>
+												<lastName>".$SalelastName."</lastName>
 												<postalZipCode>".$resultSalesOrder[shipping_address][postcode]."</postalZipCode>
 												<street1>".$street1Addr."</street1>
 												<telephone1>".$resultSalesOrder[shipping_address][telephone]."</telephone1>
 												<title>".$resultSalesOrder[customer_prefix]."</title>
 												<townCity>".$resultSalesOrder[shipping_address][city]."</townCity>
 											</customer>
-											";
+											<saleItems>";
 
 						   $ITEM_NUMBER = 0;
 						   $saleItemChargeAmt = $resultSalesOrder[base_shipping_amount]/count($resultSalesOrder[items]);
@@ -1328,6 +1341,7 @@ function ExportOrderData()
 								{
 									$flag = $e->getMessage();
 									Mage::log('Product for sale item '.$resultSalesOrder[items][$j][product_id].' does not exist. Order# is '.$resultOrderList[$i][increment_id], null, './Bluestore_salesorder.log.text');
+									$catchError = "fail";
 								}						
 								
 								try
@@ -1340,9 +1354,10 @@ function ExportOrderData()
 								{
 									$flag = $e->getMessage();
 									Mage::log('Problem in catalog_category.info '.$flag.' => '.$resultProduct[categories][0].' Exported.', null, './Bluestore_salesorder.log.text');
+									$catchError = "fail";
 								}							
 
-								$resultCategoryCode = $connection->query("SELECT code FROM `bluefish_category` WHERE category_id = '".$resultCategory[category_id]."'");
+								$resultCategoryCode = $connection->query("SELECT code FROM ".$prefix."bluefish_category WHERE category_id = '".$resultCategory[category_id]."'");
 								$resultSetCatCode = $resultCategoryCode->fetchAll(PDO::FETCH_ASSOC);
 								$updateCategoryCode = ($resultSetCatCode[0][code] == "")?$resultCategory[category_id]:$resultSetCatCode[0][code];
 
@@ -1369,6 +1384,11 @@ function ExportOrderData()
 								
 								$productDescription  = str_ireplace("&", "&#x26;", $resultProduct[name]);
 								$categoryDescription = str_ireplace("&", "&#x26;", $resultCategory[name]);
+								
+								$taxRate = ($resultSalesOrder[items][$j][tax_percent] == "")?'0.0000':$resultSalesOrder[items][$j][tax_percent];
+								$taxAmount = ($resultSalesOrder[items][$j][tax_amount] == "")?'0.0000':$resultSalesOrder[items][$j][tax_amount];
+								
+								$config_chargescode  = $credentials['mycustom_sale_chargescode'];
 								$xmlRequest .= "<saleItem>
 												<itemNumber>".$ITEM_NUMBER."</itemNumber>
 												<productCode>".$resultProduct[sku]."</productCode>
@@ -1377,20 +1397,23 @@ function ExportOrderData()
 												<categoryDescription>".$categoryDescription."</categoryDescription>
 												<price>".$resultSalesOrder[items][$j][price]."</price>
 												<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
-												<quantity>".$resultSalesOrder[items][$j][qty_invoiced]."</quantity>
+												<quantity>".number_format($resultSalesOrder[items][$j][qty_invoiced])."</quantity>
 												<unitOfMeasure>EA</unitOfMeasure>
 												<finalAmount>".$TotalfinalAmount."</finalAmount>
+												<saleItemTaxes>
 												<saleItemTax>
 													<saleItemTaxNo>1</saleItemTaxNo>
 													<taxCode>".$TAXCODE_VAL."</taxCode>
 													<baseAmount>".$resultSalesOrder[base_tax_amount]."</baseAmount>
 													<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
-													<taxRate>".$resultSalesOrder[items][$j][tax_percent]."</taxRate>
-													<taxAmount>".$resultSalesOrder[items][$j][tax_amount]."</taxAmount>
+													<taxRate>".$taxRate."</taxRate>
+													<taxAmount>".$taxAmount."</taxAmount>
 												</saleItemTax>
+												</saleItemTaxes>
+												<saleItemCharges>
 												<saleItemCharge>
 													<saleItemChargeNo>".$ITEM_NUMBER."</saleItemChargeNo>
-													<chargeCode>4</chargeCode>
+													<chargeCode>".$config_chargescode."</chargeCode>
 													<chargeDescription>".$resultSalesOrder[shipping_description]."</chargeDescription>
 													<level>1</level>
 													<type>2</type>
@@ -1400,8 +1423,8 @@ function ExportOrderData()
 													<baseAmountCurrency>".$resultSalesOrder[order_currency_code]."</baseAmountCurrency>
 													<amount>".$saleItemChargeAmt."</amount>
 												</saleItemCharge>
-												</saleItem>
-												";
+												</saleItemCharges>
+												</saleItem>";
 							}
 							
 							$credentialsPayCode	   = Mage::getStoreConfig('mycustom_section/mycustom_payment_group');
@@ -1421,16 +1444,19 @@ function ExportOrderData()
 							if($PAYMENTCODE_VAL == "")
 								$PAYMENTCODE_VAL = "1";
 								
-							$xmlRequest .= "<payment>
+							$xmlRequest .= "</saleItems>
+									<payments>
+										<payment>
 											<paymentNo>".$resultSalesOrder[increment_id]."</paymentNo>
 											<tenderType>2</tenderType>
 											<paymentMethodCode>".$PAYMENTCODE_VAL."</paymentMethodCode>
 											<amount>".$resultSalesOrder[payment][amount_ordered]."</amount>
 											<currencyCode>".$resultSalesOrder[order_currency_code]."</currencyCode>
 										</payment>
+									</payments>
 									</transactionSale>
-									</batch>
-										";
+								 </transactionSales>
+							</batch>";
 						$zz++;
 					}
 
@@ -1469,7 +1495,6 @@ function ExportCustomerData()
 	$mage_api_key  	 = $credentials_auth['mycustom_password'];
 	$enterprise_code = '';
 
-	$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 	$soap		= new SoapClient($mage_url);
 	$sessionId  = $soap->login($mage_user, $mage_api_key);
 
@@ -1482,8 +1507,9 @@ function ExportCustomerData()
 		$xmlFile = "$varpath/etc/config.xml";
 		$doc->load($xmlFile);
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 		
-		$resultCustomer = $connection->query("select id,loopCounter,loopIteration from bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule'");
+		$resultCustomer = $connection->query("select id,loopCounter,loopIteration from ".$prefix."bluefish_cron_schedule WHERE cronPath = 'mycustom_section/mycustom_customer_group/mycustom_customer_commonschedule'");
 		$resultCustomerIteration  = $resultCustomer->fetchAll(PDO::FETCH_ASSOC);
 		$CustomerIterationCounter = $resultCustomerIteration[0][loopCounter];
 		$CustomerCounterDB 	   = $resultCustomerIteration[0][loopIteration];
@@ -1518,7 +1544,7 @@ function ExportCustomerData()
 		
 		$Customer_cron_schedule_time = $Minutecronconfig." ".$Hourcronconfig." * * *";
 		
-		$connection->query("UPDATE bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCustomerIteration[0][id]."'");	
+		$connection->query("UPDATE ".$prefix."bluefish_cron_schedule SET loopIteration= '".$counterDB."' where id = '".$resultCustomerIteration[0][id]."'");	
 
 		$markersexport=$doc->getElementsByTagName('bluefish_connection_customerexport');
 		$markers=$doc->getElementsByTagName('bluefish_connection_customer');
@@ -1540,12 +1566,12 @@ function ExportCustomerData()
 		#exit;
 		for($i=0;$i<count($customerList);$i++)
 		{
-			$result = $connection->query("SELECT id,customer_code FROM `bluefish_customer` WHERE customer_id = '".$customerList[$i][customer_id]."'");
+			$result = $connection->query("SELECT id,customer_code FROM ".$prefix."bluefish_customer WHERE customer_id = '".$customerList[$i][customer_id]."'");
 
 			$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 			$numberRows = count($resultSet);
 
-			#if($numberRows == 0)
+			#if($customerList[$i][customer_id] == 2)
 			#{
 				if($zz == 0)
 				{
@@ -1564,26 +1590,18 @@ function ExportCustomerData()
 				$isCorrespondence = ($customerAddressInfo[0][is_default_shipping] == '1')?'true':'false';
 
 				$xmlRequest .= "<batch batchNo=\"".$docNO."\">
+								<customers>
 								  <customer docNo=\"".$customerList[$i][customer_id]."\">";
-				    if($numberRows == 0)
-					{						
-						$xmlRequest .= "<code></code>";
-					}
-				    else
+				    if($numberRows > 0)
 					{						
 						$xmlRequest .= "<code>".$resultSet[0][customer_code]."</code>";
-					}					
+					}
+				
 					$xmlRequest .= "<externalRef></externalRef>
 									<taxOrVatRef></taxOrVatRef>
+									<addresses>
 									<address>";
-									if($numberRows == 0)
-									{						
-										$xmlRequest .= "<code></code>";
-									}
-									else
-									{						
-										$xmlRequest .= "<code>".$resultSet[0][customer_code]."</code>";
-									}										
+				
 						$xmlRequest .= "<isCorrespondence>true</isCorrespondence>
 										<isBilling>true</isBilling>
 										<isDelivery>true</isDelivery>
@@ -1599,7 +1617,9 @@ function ExportCustomerData()
 										<phone1>".$customerAddressInfo[0][telephone]."</phone1>
 										<email>".$customerList[$i][email]."</email>
 									</address>
+									</addresses>
 								</customer>
+								</customers>
 								</batch>
 								";
 
@@ -1611,7 +1631,7 @@ function ExportCustomerData()
 
 				if($customerList[$i][firstname] != "" && $customerList[$i][lastname] != "" && $customerList[$i][email] !="" && $numberRows == 0)
 				{
-					$InsertCustomer = $connection->query("INSERT INTO bluefish_customer(id,customer_id,address_id,created_time)
+					$InsertCustomer = $connection->query("INSERT INTO ".$prefix."bluefish_customer(id,customer_id,address_id,created_time)
 											VALUES('','".$customerList[$i][customer_id]."','".$customerAddressInfo[0][customer_address_id]."','".now()."')");
 				}
 			#}

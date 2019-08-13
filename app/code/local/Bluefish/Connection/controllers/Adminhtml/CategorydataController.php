@@ -8,6 +8,7 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 	public function indexAction()
     {
 		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
 			extract($_GET);
 			extract($_REQUEST);
 			$error = "";
@@ -22,13 +23,13 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 					$error .= "Please enter Magento Category ID.<br>";
 				if($error == "")	
 				{
-					$resultExist 	 = $connection->query("select * from bluefish_category WHERE (code = '".$txtAddCode."' OR category_id = '".$txtAddCategoryID."')");
+					$resultExist 	 = $connection->query("select * from ".$prefix."bluefish_category WHERE (code = '".$txtAddCode."' OR category_id = '".$txtAddCategoryID."')");
 					$resultExistSet  = $resultExist->fetchAll(PDO::FETCH_ASSOC);
 					$numberExistRows = count($resultExistSet);
 					
 					if($numberExistRows == 0)
 					{
-						$connection->query("INSERT INTO bluefish_category(connection_id,code,category_id,created_time,update_time)
+						$connection->query("INSERT INTO ".$prefix."bluefish_category(connection_id,code,category_id,created_time,update_time)
 											VALUES('','".$txtAddCode."','".$txtAddCategoryID."','".now()."','')");
 						$txtAddCode 		= "";
 						$txtAddCategoryID	= "";
@@ -48,13 +49,13 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 					$errorupdate .= "Please enter Magento Category ID.<br>";
 				if($errorupdate == "")	
 				{
-					$resultupdate 	 = $connection->query("select * from bluefish_category WHERE (code = '".$txtEditCode."' OR category_id = '".$txtEditCategoryID."') and connection_id != '".$hdnEditCustomerID."'");
+					$resultupdate 	 = $connection->query("select * from ".$prefix."bluefish_category WHERE (code = '".$txtEditCode."' OR category_id = '".$txtEditCategoryID."') and connection_id != '".$hdnEditCustomerID."'");
 					$resultUpdateSet  = $resultupdate->fetchAll(PDO::FETCH_ASSOC);
 					$numberUpdateRows = count($resultUpdateSet);
 					
 					if($numberUpdateRows == 0)
 					{			
-						$connection->query("UPDATE bluefish_category SET code= '".$txtEditCode."',category_id= '".$txtEditCategoryID."' where connection_id = '".$hdnEditCustomerID."'");
+						$connection->query("UPDATE ".$prefix."bluefish_category SET code= '".$txtEditCode."',category_id= '".$txtEditCategoryID."' where connection_id = '".$hdnEditCustomerID."'");
 						$success .= "Record successfully Updated.<br>";
 					}
 					else
@@ -65,10 +66,10 @@ class Bluefish_Connection_Adminhtml_CategorydataController extends Mage_Adminhtm
 			##### Delete Condition
 			if($_GET["Action"] == "Del")
 			{
-				$connection->query("DELETE FROM bluefish_category where connection_id = '".$_GET[ConnectionID]."'");
+				$connection->query("DELETE FROM ".$prefix."bluefish_category where connection_id = '".$_GET[ConnectionID]."'");
 			}
 		
-		$result = $connection->query("select * from bluefish_category");
+		$result = $connection->query("select * from ".$prefix."bluefish_category");
 		$resultSet = $result->fetchAll(PDO::FETCH_ASSOC);
 		$numberRows = count($resultSet);
 		?>

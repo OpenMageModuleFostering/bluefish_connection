@@ -84,7 +84,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 				$xmlData = $xmlObj->getNode();
 				
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-				
+				$prefix 	= Mage::getConfig()->getTablePrefix();
 				$ResposeData    = $xmlData->transactionsBatch;
 				
 				$countSuccess = 0;
@@ -93,7 +93,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 					if($row->batchSuccess == "true")
 					{
 						$code 			= strval($row->transaction['docNo']);
-						$connection->query("INSERT INTO bluefish_sale_post(id,order_id,posted_time)
+						$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
 												 VALUES('','".$code."','".now()."')");
 					    $countSuccess++;
 					}	
@@ -167,6 +167,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 				$xmlData = $xmlObj->getNode();	
 
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+				$prefix 	= Mage::getConfig()->getTablePrefix();
 				
 				$responseCode   = $xmlData->transactionsBatch->batchSuccess;
 				$ResposeData    = $xmlData->transactionsBatch;
@@ -175,7 +176,7 @@ class Bluefish_Connection_Adminhtml_MyformexportController extends Mage_Adminhtm
 				{
 					 $code 			= strval($row->transaction['docNo']);
 					 $bluestoreRef	= $row->transaction->bluestoreRef;
-					 $CustomerUpdate = $connection->query("UPDATE bluefish_customer SET customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
+					 $CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
 				}
 				return $responseCode;
 			}
