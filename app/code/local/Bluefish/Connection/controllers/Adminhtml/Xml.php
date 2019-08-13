@@ -386,9 +386,11 @@ function insert_update_database2()
 					_updateStocks($SKUArr);
 					Mage::log("$count > Success:: Qty ($quantity) of Sku ($productCode) has been updated.", null, './Bluestore_stock.log.text');
 				}catch(Exception $e){
+					$ErrorMsg .= "$count > Error:: while Upating  Qty ($quantity) of Sku ($productCode) => ".$e->getMessage().":";
 					Mage::log("$count > Error:: while Upating  Qty ($quantity) of Sku ($productCode) => ".$e->getMessage()."", null, './Bluestore_stock.log.text');				
 				}
 			}else{
+					$ErrorMsg .= "$count > Error:: Product with Sku ($productCode) does't exist.".":";			
 					Mage::log("$count > Error:: Product with Sku ($productCode) does't exist.", null, './Bluestore_stock.log.text');				
 			}
 			$count++;
@@ -400,7 +402,24 @@ function insert_update_database2()
 		$prefix 	= Mage::getConfig()->getTablePrefix();
 		$coreConfigUpdate = $connection->query("UPDATE ".$prefix."core_config_data SET value = '".$versionVal."' where path = 'mycustom_section/mycustom_stock_group/mycustom_currentstockversion'");
 	}
-	
+	if($ErrorMsg != "")
+	{
+		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();					
+		$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_stock' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+		$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+		
+		$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+		$numberRows = count($resultSetScheduleID);	
+		
+		if($numberRows > 0)
+		{
+			$ErrorMsg = addslashes($ErrorMsg);
+			
+			$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+									 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+		}
+	}		
 	$flag = "success";
 	return $flag;
 }
@@ -485,6 +504,7 @@ function insert_update_database1()
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
+										$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 										$returnmessage = $flag;
 									}
 								}
@@ -514,6 +534,7 @@ function insert_update_database1()
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
+										$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 										$returnmessage = $flag;
 									}
 
@@ -561,6 +582,7 @@ function insert_update_database1()
 											catch(Exception $e)
 											{
 												$flag = $e->getMessage();
+												$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 												$returnmessage = "Fail";
 											}
 
@@ -575,6 +597,7 @@ function insert_update_database1()
 							catch(Exception $e)
 							{
 								$flag = $e->getMessage();
+								$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 								$returnmessage = $flag;
 							}
 					}
@@ -600,6 +623,7 @@ function insert_update_database1()
 					catch(Exception $e)
 					{
 						$flag = $e->getMessage();
+						$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 						$returnmessage = $flag;
 					}			
 					try
@@ -636,6 +660,7 @@ function insert_update_database1()
 							catch(Exception $e)
 							{
 								$flag = $e->getMessage();
+								$ErrorMsg .= "SKU - ".$codeSKU." ".$e->getMessage().":";
 								$returnmessage = "Fail";
 							}
 
@@ -653,6 +678,24 @@ function insert_update_database1()
 				return $flag;
 			}*/
 		}
+		if($ErrorMsg != "")
+		{
+			$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+			$prefix 	= Mage::getConfig()->getTablePrefix();					
+			$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_product' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+			$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+			
+			$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+			$numberRows = count($resultSetScheduleID);	
+			
+			if($numberRows > 0)
+			{
+				$ErrorMsg = addslashes($ErrorMsg);
+				
+				$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+										 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+			}
+		}		
 		$returnmessage = "success";
 	}
 	else
@@ -764,6 +807,7 @@ function insert_update_database()
 							catch(Exception $e)
 							{
 								$flag = $e->getMessage();
+								$ErrorMsg .= $descriptions." ".$e->getMessage().":";
 								return "Fail";
 							}
 					}
@@ -803,6 +847,7 @@ function insert_update_database()
 										catch(Exception $e)
 										{
 											$flag = $e->getMessage();
+											$ErrorMsg .= $descriptions." ".$e->getMessage().":";
 											return "Fail";
 										}
 									}
@@ -839,6 +884,7 @@ function insert_update_database()
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
+										$ErrorMsg .= $descriptions." ".$e->getMessage().":";
 										return "Fail";
 									}								
 								}
@@ -876,6 +922,7 @@ function insert_update_database()
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
+										$ErrorMsg .= $descriptions." ".$e->getMessage().":";
 										return "Fail";
 									}
 								}
@@ -922,6 +969,7 @@ function insert_update_database()
 									catch(Exception $e)
 									{
 										$flag = $e->getMessage();
+										$ErrorMsg .= $descriptions." ".$e->getMessage().":";
 										return "Fail";
 									}
 								}
@@ -940,6 +988,26 @@ function insert_update_database()
 				}
 			}
 		}
+		
+		if($ErrorMsg != "")
+		{
+			$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+			$prefix 	= Mage::getConfig()->getTablePrefix();					
+			$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_category' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+			$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+			
+			$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+			$numberRows = count($resultSetScheduleID);	
+			
+			if($numberRows > 0)
+			{
+				$ErrorMsg = addslashes($ErrorMsg);
+				
+				$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+										 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+			}
+		}	
+		
 		$flag = "success";
 		return $flag;
 	}
@@ -1018,11 +1086,13 @@ function insert_update_database3()
 						catch(Exception $e)
 						{
 							$flag = $e->getMessage();
+							$ErrorMsg .= $firstName." ".$lastName." - ".$e->getMessage().":";
 							$flag = "fail";
 						}
 					}
 					else
 					{
+						$ErrorMsg .= 'Customer ID '.$customerID.' - address not created. City, Postal Code, Phone Number OR Street address is blank.'.":";
 						Mage::log('Customer : '.$customerID.' address not created. City, Postal Code, Phone Number OR Street address is blank.', null, './Bluestore_customer.log.text');
 					}
 
@@ -1035,6 +1105,7 @@ function insert_update_database3()
 				catch(Exception $e)
 				{
 					$flag = $e->getMessage();
+					$ErrorMsg .= $firstName." ".$lastName." - ".$e->getMessage().":";
 					Mage::log('Customer not created - '.$flag.'.', null, './Bluestore_customer.log.text');
 					$flag = "Not Created";				
 				}
@@ -1080,6 +1151,7 @@ function insert_update_database3()
 								catch(Exception $e)
 								{
 									$flag = $e->getMessage();
+									$ErrorMsg .= $firstName." ".$lastName." - ".$e->getMessage().":";
 									$flag = "fail";
 								}
 							}
@@ -1093,6 +1165,7 @@ function insert_update_database3()
 						catch(Exception $e)
 						{
 							$flag = $e->getMessage();
+							$ErrorMsg .= $firstName." ".$lastName." - ".$e->getMessage().":";
 							Mage::log('Customer '.$customerID.' not created.', null, './Bluestore_customer.log.text');
 
 							$flag = "Not Created";
@@ -1101,11 +1174,30 @@ function insert_update_database3()
 					else
 					{
 						Mage::log('Customer '.$customerID.' not updated.', null, './Bluestore_customer.log.text');
+						$ErrorMsg .= 'Customer '.$customerID.' not updated.'.":";
 						$flag = "fail";
 					}
 				}
 			}
 		}
+		if($ErrorMsg != "")
+		{
+			$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+			$prefix 	= Mage::getConfig()->getTablePrefix();					
+			$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_customer' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+			$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+			
+			$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+			$numberRows = count($resultSetScheduleID);	
+			
+			if($numberRows > 0)
+			{
+				$ErrorMsg = addslashes($ErrorMsg);
+				
+				$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+										 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+			}
+		}			
 		return $flag;
 }
 

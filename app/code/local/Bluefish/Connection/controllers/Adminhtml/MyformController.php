@@ -284,7 +284,7 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				fclose($fb);
 				
 				$xmlObj  = new Varien_Simplexml_Config($response);
-				$xmlData = $xmlObj->getNode();	
+				$xmlData = $xmlObj->getNode();
 
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 				$prefix 	= Mage::getConfig()->getTablePrefix();
@@ -298,9 +298,34 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 					{
 						$code 			= strval($row->transaction['docNo']);
 						$connection->query("INSERT INTO ".$prefix."bluefish_sale_post(id,order_id,posted_time)
-												 VALUES('','".$code."','".now()."')");	
-					    $countSuccess++;												 
-					}	
+												 VALUES('','".$code."','".now()."')");
+					    $countSuccess++;
+					}
+					else
+					{
+						$ErrorMsg  .= $row->transaction->message.":";
+					}
+				}
+				if($ErrorMsg != "" || $xmlData->message !="")
+				{
+					$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_orderexport' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+					$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+					
+					$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+					$numberRows = count($resultSetScheduleID);	
+					
+					if($numberRows > 0)
+					{
+						if($ErrorMsg == "")
+							$ErrorMsg = addslashes($xmlData->message);
+						else
+							$ErrorMsg    = str_ireplace("'",'',$ErrorMsg);
+							
+						$cronStatus  = ($countSuccess > 0)?'success':'error';
+						
+						$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+												 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+					}
 				}
 				if($countSuccess > 0)
 					$responseCode = "true";
@@ -373,16 +398,50 @@ class Bluefish_Connection_Adminhtml_MyformController extends Mage_Adminhtml_Cont
 				$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 				$prefix 	= Mage::getConfig()->getTablePrefix();
 				
-				$responseCode   = $xmlData->transactionsBatch->batchSuccess;
 				$ResposeData    = $xmlData->transactionsBatch;
-
+				
+				$countSuccess = 0;
 				foreach($ResposeData as $row)
 				{
-					 $code 			= strval($row->transaction['docNo']);
-					 $bluestoreRef	= $row->transaction->bluestoreRef;
-					 $CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
+					if($row->batchSuccess == "true")
+					{
+						$code 			= strval($row->transaction['docNo']);
+						$bluestoreRef	= $row->transaction->bluestoreRef;
+						$CustomerUpdate = $connection->query("UPDATE ".$prefix."bluefish_customer SET  customer_code= '".$bluestoreRef."' where customer_id = '".$code."'");
+						$countSuccess++;
+					}
+					else
+					{
+						$ErrorMsg  .= $row->transaction->message.":";
+					}					 
 				}
-				return $responseCode;
+				if($ErrorMsg != "" || $xmlData->message !="")
+				{
+					$resultCronScheduleID = $connection->query("SELECT schedule_id FROM ".$prefix."cron_schedule WHERE job_code = 'bluefish_connection_customerexport' AND status = 'pending' ORDER BY schedule_id DESC LIMIT 1");
+					$resultSetScheduleID = $resultCronScheduleID->fetchAll(PDO::FETCH_OBJ);
+					
+					$ScheduledID = $resultSetScheduleID[0]->schedule_id;
+					$numberRows = count($resultSetScheduleID);	
+					
+					if($numberRows > 0)
+					{
+						if($ErrorMsg == "")
+							$ErrorMsg = addslashes($xmlData->message);
+						else
+							$ErrorMsg    = str_ireplace("'",'',$ErrorMsg);
+							
+						$cronStatus  = ($countSuccess > 0)?'success':'error';
+						
+						$connection->query("INSERT INTO ".$prefix."bluefish_cron_schedule_logs(id,schedule_id,error)
+												 VALUES('','".$ScheduledID."','".$ErrorMsg."')");
+					}
+				}	
+				if($countSuccess > 0)
+					$responseCode = "true";
+				else
+					$responseCode = "false";	
+
+				return $responseCode;				
 			}
 		}
 	}	

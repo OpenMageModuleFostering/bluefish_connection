@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Bluefish_Connection>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
         </Bluefish_Connection>
     </modules>
     <frontend>
@@ -148,32 +148,32 @@
 	<crontab>
 	<jobs>
             <bluefish_connection_category>
-                <schedule><cron_expr>0 17 * * *</cron_expr></schedule>
+                <schedule><cron_expr>50 14 * * *</cron_expr></schedule>
                 <run><model>connection/observer::categoryImport</model></run>
             </bluefish_connection_category>
 			<bluefish_connection_product>
-                <schedule><cron_expr>47 11 * * *</cron_expr></schedule>
+                <schedule><cron_expr>50 14 * * *</cron_expr></schedule>
                 <run><model>connection/observer::productImport</model></run>
             </bluefish_connection_product>
 			<bluefish_connection_stock>
-                <schedule><cron_expr>0 3 * * *</cron_expr></schedule>
+                <schedule><cron_expr>27 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::stockImport</model></run>
             </bluefish_connection_stock>
 			<bluefish_connection_customer>
-                <schedule><cron_expr>10 1 * * *</cron_expr></schedule>
+                <schedule><cron_expr>44 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::customerImport</model></run>
             </bluefish_connection_customer>
  			<bluefish_connection_customerexport>
-                <schedule><cron_expr>10 1 * * *</cron_expr></schedule>
+                <schedule><cron_expr>44 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::customerExport</model></run>
             </bluefish_connection_customerexport>
   			<bluefish_connection_orderexport>
-                <schedule><cron_expr>45 * * * *</cron_expr></schedule>
+                <schedule><cron_expr>50 7 * * *</cron_expr></schedule>
                 <run><model>connection/observer::salesExport</model></run>
             </bluefish_connection_orderexport>
     </jobs>
 	</crontab>
-	
+
 	<default>
     	<mycustom_section>
     		<mycustom_stock_group>

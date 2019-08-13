@@ -120,8 +120,10 @@ var arrayRow<?php echo $_htmlId ?> = {
 
     rowsCount : 0,
 
-    add : function(templateData, insertAfterId,catID='')
+    add : function(templateData, insertAfterId,catID)
     {
+		catID || (catID = "");
+		catID = catID.toString();
         // generate default template data
         if ('' == templateData) {
             var d = new Date();
@@ -148,7 +150,10 @@ var arrayRow<?php echo $_htmlId ?> = {
  this.rowsCount += 1;
 // set the selected drop-down list item
 if(catID != '')
-	var selectedData = catID.split("::");
+{
+	var selectedData = new Array();
+	selectedData = catID.split("::");
+}
 		
 <?php $j =0 ; foreach ($this->_columns as $columnName => $column): ?>
         var options = $$('td.' + templateData._id + '-' + '<?php echo $columnName?>' + ' option')
@@ -210,7 +215,7 @@ Event.observe('addToEndBtn<?php echo $_htmlId ?>', 'click', arrayRow<?php echo $
 <?php
 $_addAfterId = "headings{$_htmlId}";
 foreach ($this->getArrayRows() as $_rowId => $_row) {
-    echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}');\n";
+    echo "arrayRow{$_htmlId}.add(" . $_row->toJson() . ", '{$_addAfterId}','');\n";
     $_addAfterId = $_rowId;
 }
 ?>
@@ -220,7 +225,7 @@ $('empty<?php echo $_htmlId ?>').hide();
 Event.observe('emptyAddBtn<?php echo $_htmlId ?>', 'click', function () {
     $('grid<?php echo $_htmlId ?>').show();
     $('empty<?php echo $_htmlId ?>').hide();
-    arrayRow<?php echo $_htmlId ?>.add('', '');
+    arrayRow<?php echo $_htmlId ?>.add('', '','');
 });
 
 <?php if (!$this->getArrayRows() && ($numberRows == 0) && ($blockName == "mycustom_category_group")) { ?>

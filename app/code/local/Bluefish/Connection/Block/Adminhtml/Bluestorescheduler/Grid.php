@@ -70,18 +70,15 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 			'index' => 'finished_at',
 			'frame_callback' => array($viewHelper, 'decorateTimeFrameCallBack')
 		));
+		$this->addColumn('messages', array (
+			'header' => Mage::helper('connection')->__('Error'),
+			'index' => 'messages',
+			'frame_callback' => array($this, 'decorateMessages')
+		));		
 		$this->addColumn('status', array (
 			'header' => Mage::helper('connection')->__('Cron Status'),
 			'index' => 'status',
-			'frame_callback' => array($viewHelper, 'decorateStatus'),
-			'type' => 'options',
-			'options' => array(
-				Mage_Cron_Model_Schedule::STATUS_PENDING => Mage_Cron_Model_Schedule::STATUS_PENDING,
-				Mage_Cron_Model_Schedule::STATUS_SUCCESS => Mage_Cron_Model_Schedule::STATUS_SUCCESS,
-				Mage_Cron_Model_Schedule::STATUS_ERROR => Mage_Cron_Model_Schedule::STATUS_ERROR,
-				Mage_Cron_Model_Schedule::STATUS_MISSED => Mage_Cron_Model_Schedule::STATUS_MISSED,
-				Mage_Cron_Model_Schedule::STATUS_RUNNING => Mage_Cron_Model_Schedule::STATUS_RUNNING,
-			)
+			'frame_callback' => array($this, 'decorateStatus'),
 		));
 
 		return parent::_prepareColumns();
@@ -105,8 +102,79 @@ class Bluefish_Connection_Block_Adminhtml_Bluestorescheduler_Grid extends Mage_A
 		}
 		$this->getCollection()->addStoreFilter($value);
 	}
+	
+	public function decorateMessages($value, Bluefish_Connection_Model_Bluestorescheduler $row) {
+		$return = '';
+		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();		
+		$scheduleLog = $connection->query("SELECT error FROM ".$prefix."bluefish_cron_schedule_logs WHERE schedule_id = '".$row->getScheduleId()."'");
+		$scheduleResult = $scheduleLog->fetchAll(PDO::FETCH_ASSOC);
+		$errorLogsNum   = count($scheduleResult);	
+		
+		if ($errorLogsNum > 0) {
+			$value = $scheduleResult[0][error];
+			$value = str_replace(":","<br/>",$value);
+			$return .= '<a href="#" onclick="$(\'messages_'.$row->getScheduleId().'\').toggle(); return false;">'.Mage::helper('connection')->__('Message').'</a>';
+			$return .= '<div style="background-color: #ff0000;border: 1px solid #fff;border-radius: 3px;color: #fff;font-size: 12px;font-weight: bold;height: auto;overflow: auto;padding: 5px;position: absolute;width: 308px;display:none;" id="messages_'.$row->getScheduleId().'" >'.$value.'</div>';
+		}
+		else if($value)
+		{
+			$return .= '<a href="#" onclick="$(\'messages_'.$row->getScheduleId().'\').toggle(); return false;">'.Mage::helper('connection')->__('Message').'</a>';
+			$return .= '<div style="background-color: #ff0000;border: 1px solid #fff;border-radius: 3px;color: #fff;font-size: 12px;font-weight: bold;height: auto;overflow: auto;padding: 5px;position: absolute;width: 308px;display:none;" id="messages_'.$row->getScheduleId().'" >'.$value.'</div>';		
+		}
+		return $return;
+	}
 
+	public function decorateStatus($value, Bluefish_Connection_Model_Bluestorescheduler $row) {
+		
+		$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$prefix 	= Mage::getConfig()->getTablePrefix();
+		
+		$scheduleLog = $connection->query("SELECT schedule_id FROM ".$prefix."bluefish_cron_schedule_logs WHERE schedule_id = '".$row->getScheduleId()."'");
+		$scheduleResult = $scheduleLog->fetchAll(PDO::FETCH_ASSOC);
+		$errorLogsNum   = count($scheduleResult); 
+		
+		if($errorLogsNum == 0)
+		{
+			$resultCronScheduleMSG = $connection->query("SELECT status FROM ".$prefix."cron_schedule WHERE schedule_id = '".$row->getScheduleId()."'");
+			$resultSetScheduleID = $resultCronScheduleMSG->fetchAll(PDO::FETCH_ASSOC);		
 
+			$status = $resultSetScheduleID[0][status];
+			$errorMSG = $resultSetScheduleID[0][message];
+		}
+		else
+		{
+			$status = 'error';
+		}
+
+		switch ($status) {
+			case success:
+				$class = 'notice';
+				$result = $status;
+				break;
+			case pending:
+				$class = 'minor';
+				$result = $status;
+				break;
+			case running:
+				$class = 'minor';
+				$result = $status;
+				break;
+			case missed:
+				$class = 'major';
+				$result = $status;
+				break;
+			case error:
+				$class = 'critical';
+				$result = $status;
+				break;
+			default:
+				$result = $status;
+				break;
+		}
+		return '<span class="grid-severity-' . $class . '"><span>' .$result. '</span></span>';		
+	}
+	
 	/**
 	 * Helper function to receive grid functionality urls for current grid
 	 */

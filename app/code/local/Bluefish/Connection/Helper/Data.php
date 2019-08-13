@@ -22,40 +22,6 @@ class Bluefish_Connection_Helper_Data extends Mage_Core_Helper_Abstract
 		return $result;
 	}
 
-	/**
-	 * Decorate status values
-	 *
-	 * @return string
-	 */
-	public function decorateStatus($status) {
-		switch ($status) {
-		
-			case Mage_Cron_Model_Schedule::STATUS_SUCCESS:
-				$class = 'notice';
-				$result = $status;
-				break;
-			case Mage_Cron_Model_Schedule::STATUS_PENDING:
-				$class = 'minor';
-				$result = $status;
-				break;
-			case Mage_Cron_Model_Schedule::STATUS_RUNNING:
-				$class = 'minor';
-				$result = $status;
-				break;
-			case Mage_Cron_Model_Schedule::STATUS_MISSED:
-				$class = 'major';
-				$result = $status;
-				break;
-			case Mage_Cron_Model_Schedule::STATUS_ERROR:
-				$class = 'critical';
-				$result = $status;
-				break;
-			default:
-				$result = $status;
-				break;
-		}
-		return '<span class="grid-severity-' . $class . '"><span>' .$result. '</span></span>';;
-	}
 
 	/**
 	 * Wrapepr for decorateCronTime to be used a frame_callback
