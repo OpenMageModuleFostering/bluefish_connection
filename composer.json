@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Bluefish_Connection",
+    "name": "OpenMageModuleFostering\/Bluefish_Connection",
     "type": "magento-module",
     "license": "OSL-v3.0",
     "homepage": "",
     "description": "Integrate Magento with Bluestore Live POS. Bring your online and real world shop together - categories, products, customers, inventory and sales.",
     "authors": [
-    {
-        "name": "J Doyle",
-        "email": "jdoyle@bluefishretail.com"
-    }
-],
+        {
+            "name": "J Doyle",
+            "email": "jdoyle@bluefishretail.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
