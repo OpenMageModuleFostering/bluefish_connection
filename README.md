@@ -1,3 +1,5 @@
+
+
 ## Original Package Description
 
 Integrate Magento with Bluestore Live POS. Bring your online and real world shop together - categories, products, customers, inventory and sales.
